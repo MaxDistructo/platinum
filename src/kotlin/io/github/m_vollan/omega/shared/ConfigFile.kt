@@ -29,4 +29,31 @@ object ConfigFile {
             return get(token)
         }
     }
+
+    fun getServerConfig(serverId: Long): JSONObject{
+        return getServerConfig(serverId.toString())
+    }
+    fun getServerConfig(serverId: String): JSONObject{
+        if(configFile != null) {
+            return configFile!!.getJSONObject(serverId)
+        }
+        else {
+            loadDefaultConfig()
+            return getServerConfig(serverId)
+        }
+    }
+
+    fun serverGet(serverId: Long, token: String): String{
+        return serverGet(serverId.toString(), token)
+    }
+    fun serverGet(serverId: String, token: String): String{
+        if(configFile != null) {
+            val config = getServerConfig(serverId)
+            return config.getString(token)
+        }
+        else {
+            loadDefaultConfig()
+            return serverGet(serverId, token)
+        }
+    }
 }
