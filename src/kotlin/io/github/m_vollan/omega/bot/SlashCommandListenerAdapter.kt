@@ -1,9 +1,8 @@
 package io.github.m_vollan.omega.bot
 
-import kotlinx.coroutines.*
-import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Role
+import io.github.m_vollan.omega.shared.ConfigFile
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
@@ -20,6 +19,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "give_all_role_restricted" -> giveRoleBulk(event,false)
             "test_give_all_role" -> giveRoleBulk(event, true)
             "test_give_all_role_restricted" -> giveRoleBulk(event,true)
+            "suggest" -> addSuggestion(event)
             else -> println("Command not found")
         }
     }
@@ -102,5 +102,19 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         RoleFindThread(guild, otherRoles.toList(), membersOfRestricted).start()
         //Start another thread to add the roles to all the members
         AddRoleThread(event, guild, role, membersOfRestricted, testMode).start()
+    }
+
+    fun addSuggestion(event: SlashCommandInteractionEvent){
+        event.deferReply().queue()
+        val suggestionChannel: TextChannel? = event.guild!!.getTextChannelById(ConfigFile.serverGet(event.guild!!.idLong, "suggestion"))
+        suggestionChannel!!.sendMessageEmbeds(
+            EmbedBuilder()
+                .addField(MessageEmbed.Field("New Suggestion:", event.getOption("suggestion")!!.asString,true))
+                .setAuthor(event.member!!.effectiveName + "#" + event.member!!.user.discriminator, event.member!!.avatarUrl, event.member!!.avatarUrl)
+                .setColor(event.member!!.color)
+                .setFooter(event.guild!!.name, event.guild!!.iconUrl)
+                .build()
+        )
+        event.reply("Suggestion Sent")
     }
 }

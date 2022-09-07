@@ -60,6 +60,10 @@ object BotMain {
             .addOption(OptionType.ROLE, "role4", "3rd restriction", false, false)
             .addOption(OptionType.ROLE, "role5", "4th restriction", false, false)
         ).complete()
+        jda.upsertCommand(Commands.slash("suggest", "Suggest a new thing for the server to add")
+            .setGuildOnly(true)
+            .addOption(OptionType.STRING, "suggestion", "The suggestion",true, false)
+        ).complete()
         logger.info("Finished adding slash commands")
     }
 
