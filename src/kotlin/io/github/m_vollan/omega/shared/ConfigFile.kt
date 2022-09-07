@@ -3,7 +3,8 @@ package io.github.m_vollan.omega.shared
 import org.json.*
 
 object ConfigFile {
-    var configFile: JSONObject? = null
+    private var configFile: JSONObject? = null
+    private var defaultConfig: String = "/config.json"
     fun getToken() : String {
         if(configFile != null){
             return configFile!!.getString("token")
@@ -18,8 +19,16 @@ object ConfigFile {
         configFile = JSONObject(JSONTokener(Utils.readFile(Utils.getRunningDir() + file)))
     }
     fun loadDefaultConfig(){
-        loadConfigFrom("/config.json")
+        loadConfigFrom(defaultConfig)
     }
+    fun setDefaultConfig(path: String){
+        defaultConfig = path
+    }
+
+    fun writeDefaultConfig(){
+        Utils.writeFile(configFile.toString(), Utils.getRunningDir() + defaultConfig)
+    }
+
     fun get(token: String): String{
         if(configFile != null) {
             return configFile!!.getString(token)
@@ -54,6 +63,23 @@ object ConfigFile {
         else {
             loadDefaultConfig()
             return serverGet(serverId, token)
+        }
+    }
+
+    fun serverSet(serverId: String, token: String, value: String){
+        if(configFile != null) {
+            val config = getServerConfig(serverId)
+            //Override what we need to change
+            config.put(token, value)
+            configFile!!.put(serverId, config)
+            //Write out the change
+            writeDefaultConfig()
+            //Reload the change from disk
+            loadDefaultConfig()
+        }
+        else {
+            loadDefaultConfig()
+            return serverSet(serverId, token, value)
         }
     }
 }

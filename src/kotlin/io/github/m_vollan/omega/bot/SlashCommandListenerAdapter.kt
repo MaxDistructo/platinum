@@ -20,6 +20,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             //"test_give_all_role" -> giveRoleBulk(event, true)
             //"test_give_all_role_restricted" -> giveRoleBulk(event,true)
             "suggest" -> addSuggestion(event)
+            "set" -> setConfigValue(event)
             else -> println("Command not found")
         }
     }
@@ -116,6 +117,14 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 .setFooter(event.guild!!.name, event.guild!!.iconUrl)
                 .build()
         )
-        event.reply("Suggestion Sent")
+        event.reply("Suggestion Sent").setEphemeral(true).queue()
+    }
+
+    fun setConfigValue(event: SlashCommandInteractionEvent){
+        event.deferReply().queue()
+        when(event.subcommandName){
+            "suggestion_channel" -> ConfigFile.serverSet(event.guild!!.id, "suggestion", event.getOption("channel")!!.asChannel.id)
+        }
+        event.reply("Done!").setEphemeral(true).queue()
     }
 }

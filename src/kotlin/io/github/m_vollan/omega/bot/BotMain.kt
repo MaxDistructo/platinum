@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import net.dv8tion.jda.api.interactions.commands.localization.LocalizationMap
 import net.dv8tion.jda.api.interactions.commands.privileges.IntegrationPrivilege
 import net.dv8tion.jda.api.requests.RestAction
@@ -46,6 +47,14 @@ object BotMain {
             .setGuildOnly(true)
             .addOption(OptionType.STRING, "suggestion", "The suggestion",true, false)
         ).complete()
+        jda.upsertCommand(Commands.slash("set", "Set a config value")
+            .setGuildOnly(true)
+            .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER))
+            .addSubcommands(
+                SubcommandData("suggestion_channel", "Set the suggestion channel")
+                    .addOption(OptionType.CHANNEL, "channel", "The channel to set as the suggestion channel", true, false)
+            )
+        )
         logger.info("Finished adding slash commands")
     }
 
