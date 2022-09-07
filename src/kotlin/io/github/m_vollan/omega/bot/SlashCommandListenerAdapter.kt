@@ -15,10 +15,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 .queue()
             "echo" -> event.reply(event.getOption("message")!!.asString).queue()
             "give_role" -> giveRole(event)
-            "give_all_role" -> giveRoleBulk(event, false)
-            "give_all_role_restricted" -> giveRoleBulk(event,false)
-            "test_give_all_role" -> giveRoleBulk(event, true)
-            "test_give_all_role_restricted" -> giveRoleBulk(event,true)
+            "give_all_role" -> giveRoleBulk(event)
+            //"give_all_role_restricted" -> giveRoleBulk(event)
+            //"test_give_all_role" -> giveRoleBulk(event, true)
+            //"test_give_all_role_restricted" -> giveRoleBulk(event,true)
             "suggest" -> addSuggestion(event)
             else -> println("Command not found")
         }
@@ -78,12 +78,13 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
     }
 
-    fun giveRoleBulk(event: SlashCommandInteractionEvent, testMode: Boolean)
+    fun giveRoleBulk(event: SlashCommandInteractionEvent)
     {
         event.deferReply().queue()
         val role = event.getOption("role")!!.asRole
         val guild = event.guild!!
         val otherRoles: MutableList<Role> = mutableListOf()
+        val testMode = event.getOption("testMode")?.asBoolean ?: false
         //Try to get each role one by one. This shouldn't fail until we get all the restrictions in the list
         try{
             otherRoles.add(event.getOption("role2")!!.asRole)
