@@ -3,6 +3,7 @@ package io.github.m_vollan.omega.bot
 import io.github.m_vollan.omega.shared.ConfigFile
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
@@ -107,21 +108,32 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     }
 
     fun addSuggestion(event: SlashCommandInteractionEvent){
-        event.deferReply().queue()
-        val suggestionChannel: TextChannel? = event.guild!!.getTextChannelById(ConfigFile.serverGet(event.guild!!.idLong, "suggestion"))
+        val config = ConfigFile.serverGet(event.guild!!.idLong, "suggestion") ?: "0"
+        if(config == "0")
+        {
+            event.reply("Please set a suggestion channel before running the suggestion command.").setEphemeral(true).queue()
+            return
+        }
+        val suggestionChannel: TextChannel? = event.guild!!.getTextChannelById(config)
+
+        //Send an embed to the channel and add 2 reactions to the message after it has been sent
         suggestionChannel!!.sendMessageEmbeds(
             EmbedBuilder()
-                .addField(MessageEmbed.Field("New Suggestion:", event.getOption("suggestion")!!.asString,true))
-                .setAuthor(event.member!!.effectiveName + "#" + event.member!!.user.discriminator, event.member!!.avatarUrl, event.member!!.avatarUrl)
+                .setTitle("Suggestion: ")
+                .setDescription(event.getOption("suggestion")!!.asString)
+                //.addField(MessageEmbed.Field("", event.getOption("suggestion")!!.asString,true))
+                .setAuthor(event.member!!.effectiveName + "#" + event.member!!.user.discriminator, event.member!!.effectiveAvatarUrl, event.member!!.effectiveAvatarUrl)
                 .setColor(event.member!!.color)
-                .setFooter(event.guild!!.name, event.guild!!.iconUrl)
+                //.setFooter(event.guild!!.name, event.guild!!.iconUrl)
                 .build()
-        )
+        ).queue { m ->
+            m.addReaction(Emoji.fromUnicode("U+2B06")).queue()
+            m.addReaction(Emoji.fromUnicode("U+2B07")).queue()
+        }
         event.reply("Suggestion Sent").setEphemeral(true).queue()
     }
 
     fun setConfigValue(event: SlashCommandInteractionEvent){
-        event.deferReply().queue()
         when(event.subcommandName){
             "suggestion_channel" -> ConfigFile.serverSet(event.guild!!.id, "suggestion", event.getOption("channel")!!.asChannel.id)
         }

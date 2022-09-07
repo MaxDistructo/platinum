@@ -12,6 +12,7 @@ plugins {
   java
   idea
   kotlin("jvm") version "1.7.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     //id "com.github.ben-manes.versions" version "0.20.0"
     //id 'com.sedmelluq.jdaction' version '1.0.2'
 }
@@ -47,12 +48,11 @@ tasks {
             jvmTarget = JavaVersion.VERSION_16.toString()
         }
     }
-    val copyToLib by registering(Copy::class) {
-        into("$buildDir/lib")
-        //from(configurations.)
+    jar{
+        manifest.attributes["Main-Class"] = "io.github.m_vollan.omega.Main"
     }
-    val stage by registering {
-        dependsOn("build", copyToLib)
+    "build" {
+        dependsOn(fatJar)
     }
 }
 val compileKotlin: KotlinCompile by tasks
@@ -62,4 +62,15 @@ compileKotlin.kotlinOptions {
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = JavaVersion.VERSION_16.toString()
+}
+
+val fatJar = task("fatJar", type = Jar::class) {
+    baseName = "${project.name}-fat"
+    manifest {
+        attributes["Implementation-Title"] = "Gradle Jar File Example"
+        attributes["Implementation-Version"] = "1.0"
+        attributes["Main-Class"] = "io.github.m_vollan.omega.Main"
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    with(tasks.jar.get() as CopySpec)
 }

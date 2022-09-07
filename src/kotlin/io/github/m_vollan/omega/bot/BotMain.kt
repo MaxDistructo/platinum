@@ -54,8 +54,8 @@ object BotMain {
                 SubcommandData("suggestion_channel", "Set the suggestion channel")
                     .addOption(OptionType.CHANNEL, "channel", "The channel to set as the suggestion channel", true, false)
             )
-        )
-        logger.info("Finished adding slash commands")
+        ).complete()
+        logger.info("Finished adding slash commands ")
     }
 
 }

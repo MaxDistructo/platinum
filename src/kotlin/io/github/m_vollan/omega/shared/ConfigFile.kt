@@ -5,9 +5,15 @@ import org.json.*
 object ConfigFile {
     private var configFile: JSONObject? = null
     private var defaultConfig: String = "/config.json"
-    fun getToken() : String {
+    fun getToken() : String? {
         if(configFile != null){
-            return configFile!!.getString("token")
+            try {
+                return configFile!!.getString("token")
+            }
+            catch(e: JSONException)
+            {
+                return null
+            }
         }
         else
         {
@@ -29,9 +35,15 @@ object ConfigFile {
         Utils.writeFile(configFile.toString(), Utils.getRunningDir() + defaultConfig)
     }
 
-    fun get(token: String): String{
+    fun get(token: String): String?{
         if(configFile != null) {
-            return configFile!!.getString(token)
+            try{
+                return configFile!!.getString(token)
+            }
+            catch(e: JSONException)
+            {
+                return null
+            }
         }
         else {
             loadDefaultConfig()
@@ -44,7 +56,13 @@ object ConfigFile {
     }
     fun getServerConfig(serverId: String): JSONObject{
         if(configFile != null) {
-            return configFile!!.getJSONObject(serverId)
+            try {
+                return configFile!!.getJSONObject(serverId)
+            }
+            catch(e: JSONException)
+            {
+                return JSONObject()
+            }
         }
         else {
             loadDefaultConfig()
@@ -52,13 +70,19 @@ object ConfigFile {
         }
     }
 
-    fun serverGet(serverId: Long, token: String): String{
+    fun serverGet(serverId: Long, token: String): String?{
         return serverGet(serverId.toString(), token)
     }
-    fun serverGet(serverId: String, token: String): String{
+    fun serverGet(serverId: String, token: String): String?{
         if(configFile != null) {
             val config = getServerConfig(serverId)
-            return config.getString(token)
+            try {
+                return config.getString(token)
+            }
+            catch(e: JSONException)
+            {
+                return null
+            }
         }
         else {
             loadDefaultConfig()
