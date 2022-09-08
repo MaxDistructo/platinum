@@ -2,8 +2,10 @@ package io.github.m_vollan.omega.bot
 
 import io.github.m_vollan.omega.shared.ConfigFile
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.entities.templates.TemplateChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
@@ -22,6 +24,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             //"test_give_all_role_restricted" -> giveRoleBulk(event,true)
             "suggest" -> addSuggestion(event)
             "set" -> setConfigValue(event)
+            "lockdown" -> lockdownChannel(event)
+            "unlock" -> unlockChannel(event)
+            "lockdownServer" -> lockdownServer(event)
+            "unlockServer" -> unlockServer(event)
             else -> println("Command not found")
         }
     }
@@ -139,4 +145,65 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
         event.reply("Done!").setEphemeral(true).queue()
     }
+
+    fun lockdownChannel(event: SlashCommandInteractionEvent){
+        val channel = event.guildChannel
+        //channel.permissionContainer.memberPermissionOverrides
+        for(permission in channel.permissionContainer.permissionOverrides){
+          if(permission.allowed.contains(Permission.MESSAGE_SEND)) {
+              val allowed = permission.allowed
+              val denied = permission.denied
+              allowed.remove(Permission.MESSAGE_SEND)
+              channel.permissionContainer.upsertPermissionOverride(permission.permissionHolder!!).setAllowed(allowed).setDenied(denied)
+          }
+        }
+        channel.permissionContainer.upsertPermissionOverride(event.guild!!.publicRole).deny(Permission.MESSAGE_SEND).queue()
+        event.reply("Done! :lock:")
+    }
+
+    fun unlockChannel(event: SlashCommandInteractionEvent) {
+        val channel = event.guildChannel
+        for(permission in channel.permissionContainer.permissionOverrides){
+            permission.delete().queue()
+        }
+        channel.asStandardGuildChannel().manager.sync()
+        event.reply("Done! :unlock:")
+    }
+
+    fun lockdownServer(event: SlashCommandInteractionEvent){
+        //O(N^2).... this will be slow af but does a load of work
+        event.deferReply().queue()
+        for(channel in event.guild!!.channels){
+            for(permission in channel.permissionContainer.permissionOverrides)
+            {
+                //Handle the 1 case we DON'T want to override
+                if(permission.isRoleOverride && permission.role != event.getOption("role") && permission.allowed.contains(Permission.MESSAGE_SEND))
+                {
+                    val allowed = permission.allowed
+                    val denied = permission.denied
+                    allowed.remove(Permission.MESSAGE_SEND)
+                    //permission.delete().complete()
+                    channel.permissionContainer.upsertPermissionOverride(permission.permissionHolder!!).setAllowed(allowed).setDenied(denied).queue()
+                }
+                else
+                {
+                    val allowed = permission.allowed
+                    val denied = permission.denied
+                    allowed.remove(Permission.MESSAGE_SEND)
+                    //permission.delete().complete()
+                    channel.permissionContainer.upsertPermissionOverride(permission.permissionHolder!!).setAllowed(allowed).setDenied(denied).queue()
+                }
+            }
+        }
+        event.reply("Done! :lock:").queue()
+    }
+
+    fun unlockServer(event: SlashCommandInteractionEvent){
+
+        for(channel in event.guild!!.channels){
+            (channel as StandardGuildChannel).manager.sync().queue()
+        }
+        event.reply("Done! :unlock:").queue()
+    }
 }
+
