@@ -51,6 +51,64 @@ object ConfigFile {
         }
     }
 
+    fun setUser(userId: String, key: String, value: String){
+        lateinit var userConfig: JSONObject
+        if(configFile != null) {
+            try {
+                userConfig = configFile!!.getJSONObject(userId)
+            }
+            catch(e: JSONException)
+            {
+                userConfig = JSONObject()
+            }
+        }
+        else{
+            loadDefaultConfig()
+            return setUser(userId, key, value)
+        }
+        //By the time we get to here, userConfig MUST be a value
+        userConfig.put(key, value)
+
+    }
+
+    fun getUser(userId: String, key: String): String{
+        lateinit var userConfig: JSONObject
+        if(configFile != null) {
+            try {
+                userConfig = configFile!!.getJSONObject(userId)
+            }
+            catch(e: JSONException)
+            {
+                return ""
+            }
+        }
+        else{
+            loadDefaultConfig()
+            return getUser(userId, key)
+        }
+        //By the time we get to here, userConfig MUST be a value
+       return userConfig.getString(key)
+    }
+
+    fun deleteUser(userId: String){
+        lateinit var userConfig: JSONObject
+        if(configFile != null) {
+            try {
+                configFile!!.remove(userId.toString())
+            }
+            catch(e: JSONException)
+            {
+                //User doesn't exist in our config.
+                //Just return
+                return;
+            }
+        }
+        else{
+            loadDefaultConfig()
+            return deleteUser(userId)
+        }
+    }
+
     fun getServerConfig(serverId: Long): JSONObject{
         return getServerConfig(serverId.toString())
     }

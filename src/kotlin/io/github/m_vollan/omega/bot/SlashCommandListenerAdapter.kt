@@ -216,7 +216,9 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         val roles = event.guild!!.getRolesByName(user.name, false)
         val role: Role
 
+
         if(roles.isEmpty()){
+
             role = event.guild!!.createRole()
                 .setName(user.name)
                 .setColor(Color.decode(color))
