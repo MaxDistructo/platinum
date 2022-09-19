@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.entities.templates.TemplateChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.OptionMapping
+import java.awt.Color
 
 class SlashCommandListenerAdapter: ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
@@ -22,12 +24,13 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             //"give_all_role_restricted" -> giveRoleBulk(event)
             //"test_give_all_role" -> giveRoleBulk(event, true)
             //"test_give_all_role_restricted" -> giveRoleBulk(event,true)
-            "suggest" -> addSuggestion(event)
+            //"suggest" -> addSuggestion(event)
             "set" -> setConfigValue(event)
             "lockdown" -> lockdownChannel(event)
             "unlock" -> unlockChannel(event)
-            "lockdownServer" -> lockdownServer(event)
-            "unlockServer" -> unlockServer(event)
+            "lockdown_server" -> lockdownServer(event)
+            "unlock_server" -> unlockServer(event)
+            "color" -> setColor(event)
             else -> println("Command not found")
         }
     }
@@ -113,6 +116,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         AddRoleThread(event, guild, role, membersOfRestricted, testMode).start()
     }
 
+    //This is not needed anymore with the addition of Fourm channels.
     fun addSuggestion(event: SlashCommandInteractionEvent){
         val config = ConfigFile.serverGet(event.guild!!.idLong, "suggestion") ?: "0"
         if(config == "0")
@@ -204,6 +208,26 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             (channel as StandardGuildChannel).manager.sync().queue()
         }
         event.reply("Done! :unlock:").queue()
+    }
+
+    fun setColor(event: SlashCommandInteractionEvent){
+        val user: User = event.getOption("user", event.user, OptionMapping::getAsUser)
+        val color = event.getOption("color")!!.asString
+        val roles = event.guild!!.getRolesByName(user.name, false)
+        val role: Role
+
+        if(roles.isEmpty()){
+            role = event.guild!!.createRole()
+                .setName(user.name)
+                .setColor(Color.decode(color))
+                .complete()
+            event.guild!!.addRoleToMember(user, role)
+        }
+        else{
+            role = roles[0]
+            role.manager.setColor(Color.decode(color)).complete()
+        }
+        event.reply("Done!").complete()
     }
 }
 
