@@ -3,6 +3,7 @@ FROM eclipse-temurin:17-jdk-jammy
 RUN echo "1.1" > version
 RUN apt update
 RUN apt install tesseract-ocr -y
+RUN ls -lah .
 #Below commands copy and build the repo
 #RUN git clone https://github.com/MaxDistructo/platinum
 #WORKDIR /opt/platinum/platinum
