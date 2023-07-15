@@ -14,12 +14,12 @@ steps:
     image: thegeeklab/drone-docker-buildx
     privileged: true
     settings:
-      registry: docker-registry.engineermantra.dedyn.io
+      registry: docker.io
       username:
         from_secret: registry_username
       password:
         from_secret: registry_pwd
-      repo: docker-registry.engineermantra.dedyn.io/platinum
+      repo: maxdistructo2/platinum
       tags:
         - latest
       platforms:
