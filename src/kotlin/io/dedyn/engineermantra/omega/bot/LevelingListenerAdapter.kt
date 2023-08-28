@@ -2,6 +2,7 @@ package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.Utils.calculateLevel
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -31,10 +32,10 @@ class LevelingListenerAdapter: ListenerAdapter() {
         if((random.nextInt() % 10) == 1)
         {
             val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.author.idLong, event.guild.idLong)
-            val currentLevel = calculateLevel(leveling.levelingPoints.toDouble())
-            leveling.textPoints += 1;
+            val currentLevel = calculateLevel(leveling.levelingPoints)
+            leveling.textPoints += 1
             ConfigMySQL.updateLevelingPoints(leveling)
-            val newLevel = calculateLevel(leveling.levelingPoints.toDouble())
+            val newLevel = calculateLevel(leveling.levelingPoints)
             //We are going to use an exponential curve on leveling
             if(newLevel > currentLevel){
                 DiscordUtils.checkLeveledRoles(event.member!!)
@@ -43,34 +44,43 @@ class LevelingListenerAdapter: ListenerAdapter() {
             textUserList[event.member!!.idLong] = System.currentTimeMillis()
         }
     }
-
     val userList = HashMap<Long,Long>()
+    private fun grantPoints(member: Member)
+    {
+        val leaveTime = System.currentTimeMillis()
+        val joinTime = userList[member.idLong] ?: return
+        val timeInVC = leaveTime - joinTime
+        val leveling = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong)
+        val currentLevel = calculateLevel(leveling.levelingPoints)
+        //1 point per 10 minutes in VC.
+        leveling.voicePoints += (timeInVC / 60*100).toInt()
+        val newLevel = calculateLevel(leveling.levelingPoints)
+        if(newLevel > currentLevel){
+            DiscordUtils.checkLeveledRoles(member)
+            member.guild.defaultChannel!!.asTextChannel().sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
+        }
+        //We don't trust Discord to not bug and double call this method so overwrite the time so it doesn't
+        //affect us too badly.
+        userList[member.idLong] = leaveTime
+    }
+
     //Triggers when a user joins/leaves VC
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
         //Moved between VCs
         if(event.channelJoined != null && event.channelLeft != null)
         {
+            //On joining the AFK channel from another channel, grant points earned and stop counting.
+            if(event.channelJoined!!.asVoiceChannel().name == "AFK")
+            {
+                grantPoints(event.member)
+            }
             //Ignore this case for now, we just need to catch it at the start to not mistake this as a DC.
             return;
         }
         //User Disconnected
         else if(event.channelJoined != null)
         {
-            val leaveTime = System.currentTimeMillis()
-            val joinTime = userList[event.member.idLong] ?: return
-            val timeInVC = leaveTime - joinTime
-            val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.member.idLong, event.guild.idLong)
-            val currentLevel = calculateLevel(leveling.levelingPoints.toDouble())
-            //1 point per 10 minutes in VC.
-            leveling.voicePoints += (timeInVC / 10).toInt()
-            val newLevel = calculateLevel(leveling.levelingPoints.toDouble())
-            if(newLevel > currentLevel){
-                DiscordUtils.checkLeveledRoles(event.member)
-                event.guild.defaultChannel!!.asTextChannel().sendMessage("${event.member.asMention} has leveled up to $newLevel!").queue()
-            }
-            //We don't trust Discord to not bug and double call this method so overwrite the time so it doesnt
-            //affect us too badly.
-            userList[event.member.idLong] = leaveTime
+            grantPoints(event.member)
         }
         //User Joined
         else{
