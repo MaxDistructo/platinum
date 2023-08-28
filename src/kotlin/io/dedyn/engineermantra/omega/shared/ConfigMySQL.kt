@@ -85,9 +85,9 @@ object ConfigMySQL: ConfigFileInterface {
                 ");")
         connection.createStatement().execute("CREATE TABLE leveling(" +
                 "levelingId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,"+
-                "userId BIGINT" +
-                "serverId BIGINT" +
-                "voicePoints INT" +
+                "userId BIGINT," +
+                "serverId BIGINT," +
+                "voicePoints INT," +
                 "chatPoints INT" +
                 ");"
         )

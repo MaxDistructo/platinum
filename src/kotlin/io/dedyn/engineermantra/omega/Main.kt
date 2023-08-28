@@ -28,7 +28,7 @@ object Main {
         BotMain.logger = LoggerFactory.getLogger("Omega") as Logger
 
         BotMain.logger.info("Setting up JDA")
-        val builder: JDABuilder = JDABuilder.create(ConfigFileJson.getToken(), GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES)
+        val builder: JDABuilder = JDABuilder.create(ConfigFileJson.getToken(), GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES)
             .setBulkDeleteSplittingEnabled(false)
             .setCompression(Compression.NONE)
             .setActivity(Activity.playing("Use /help to get commands"))
