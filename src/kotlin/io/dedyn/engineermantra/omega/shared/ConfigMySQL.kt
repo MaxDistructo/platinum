@@ -1,9 +1,7 @@
 package io.dedyn.engineermantra.omega.shared
 
-import net.dv8tion.jda.api.entities.Message
 import java.sql.Connection
 import java.sql.DriverManager
-import java.sql.SQLException
 
 object ConfigMySQL: ConfigFileInterface {
     lateinit var connection: Connection
@@ -85,6 +83,14 @@ object ConfigMySQL: ConfigFileInterface {
                 "uid BIGINT PRIMARY KEY NOT NULL UNIQUE," +
                 "json VARCHAR(2048)"+
                 ");")
+        connection.createStatement().execute("CREATE TABLE leveling(" +
+                "levelingId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,"+
+                "userId BIGINT" +
+                "serverId BIGINT" +
+                "voicePoints INT" +
+                "chatPoints INT" +
+                ");"
+        )
     }
 
     fun addStrike(strike: DatabaseObject.Strike)
@@ -214,6 +220,30 @@ object ConfigMySQL: ConfigFileInterface {
         assertIsConnected()
         val query = connection.createStatement().executeQuery("SELECT uid, rid FROM rolebans WHERE uid=$uid AND rid=$rid;")
         return query.next()
+    }
+
+    fun getLevelingPoints(userId: Long, serverId: Long): DatabaseObject.Leveling?{
+        assertIsConnected()
+        val query = connection.createStatement().executeQuery("SELECT * FROM leveling WHERE userId=$userId AND serverId=$serverId;")
+        if(!query.next()){
+            return null
+        }
+        return DatabaseObject.Leveling(query.getInt("levelingId"), userId, serverId, query.getInt("voicePoints"), query.getInt("textPoints"))
+    }
+
+    fun getLevelingPointsOrDefault(userId: Long, serverId: Long): DatabaseObject.Leveling {
+        return getLevelingPoints(userId, serverId) ?: DatabaseObject.Leveling(0, userId, serverId, 0, 0)
+    }
+    fun updateLevelingPoints(obj: DatabaseObject.Leveling)
+    {
+        assertIsConnected()
+        if(getLevelingPoints(obj.userId, obj.serverId) == null)
+        {
+            connection.createStatement().executeUpdate("INSERT INTO usernames (userId, serverId, voicePoints, textPoints) VALUES (${obj.userId}, ${obj.serverId}, ${obj.voicePoints}, ${obj.textPoints})")
+            return
+        }
+        connection.createStatement().executeUpdate("UPDATE usernames SET textPoints=${obj.textPoints} WHERE levelingId=${obj.levelingId}")
+        connection.createStatement().executeUpdate("UPDATE usernames SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId}")
     }
 
 

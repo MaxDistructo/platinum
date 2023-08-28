@@ -24,4 +24,11 @@ object DatabaseObject {
     data class Usernames(val userId: Long, val json: String)
 
     data class RoleBannedUser(val banId: Int, val userId: Long, val roleId: Long)
+
+    data class Leveling(val levelingId: Int, val userId: Long, val serverId: Long, var voicePoints: Int, var textPoints: Int){
+        //This is done this way so that it's accurate based on the 2 values you can change.
+        //Enforces only modifying the voice/text points, not the final value.
+        val levelingPoints
+                get() = voicePoints + textPoints
+    }
 }

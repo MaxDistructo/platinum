@@ -1,6 +1,8 @@
 package io.dedyn.engineermantra.omega.bot
 
+import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.MessageLevel
+import io.dedyn.engineermantra.omega.shared.Utils
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
@@ -125,5 +127,25 @@ object DiscordUtils {
 
 
         return builder.build()
+    }
+
+    //Anti-raid measure, add a role if they pass the raid check.
+    fun giveLeveledRoles(guild: Guild) {
+        if (guild.idLong != 967140876298092634) {
+            return
+        }
+        for (member in guild.members) {
+            checkLeveledRoles(member)
+
+        }
+    }
+    fun checkLeveledRoles(member: Member) {
+        val guild = member.guild
+        val leveling = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, guild.idLong)
+        val level = Utils.calculateLevel(leveling.levelingPoints.toDouble())
+        when (level) {
+            10 -> guild.addRoleToMember(member, guild.getRolesByName("User", false)[0]).queue()
+            25 -> guild.addRoleToMember(member, guild.getRolesByName("Trusted User", false)[0]).queue()
+        }
     }
 }
