@@ -40,7 +40,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
             BotMain.logger.info("Current Points: " + leveling.voicePoints)
             val currentLevel = calculateLevel(leveling.levelingPoints)
             leveling.textPoints += 1
-            BotMain.logger.info("New Points: " + leveling.voicePoints)
+            BotMain.logger.info("New Points: " + leveling.levelingPoints)
             ConfigMySQL.updateLevelingPoints(leveling)
             val newLevel = calculateLevel(leveling.levelingPoints)
             //We are going to use an exponential curve on leveling
@@ -63,7 +63,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
         BotMain.logger.info("Current Points: " + leveling.voicePoints)
         //1 point per 10 minutes in VC.
         leveling.voicePoints += (timeInVC / 60*100).toInt()
-        BotMain.logger.info("New Points: " + leveling.voicePoints)
+        BotMain.logger.info("New Points: " + leveling.levelingPoints)
         val newLevel = calculateLevel(leveling.levelingPoints)
         if(newLevel > currentLevel){
             DiscordUtils.checkLeveledRoles(member)
@@ -88,7 +88,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
             return
         }
         //User Disconnected
-        else if(event.channelJoined != null)
+        else if(event.channelJoined == null && event.channelLeft != null)
         {
             grantPoints(event.member)
         }
