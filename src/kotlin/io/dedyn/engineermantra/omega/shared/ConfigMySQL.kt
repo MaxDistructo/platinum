@@ -18,7 +18,7 @@ object ConfigMySQL: ConfigFileInterface {
         db_name = ConfigFileJson.get("sql_database") ?: "omega"
         username = ConfigFileJson.get("sql_username") ?: "omega"
         password = ConfigFileJson.get("sql_password") ?: "REDACTED"
-        if(BotMain.jda.selfUser.idLong == 1107721065947484302L)
+        if(BotMain.jda.selfUser.idLong != 1107721065947484302L)
         {
             load()
         }
