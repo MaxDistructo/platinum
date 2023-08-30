@@ -62,12 +62,13 @@ class LevelingListenerAdapter: ListenerAdapter() {
         val currentLevel = calculateLevel(leveling.levelingPoints)
         BotMain.logger.info("Current Points: " + leveling.voicePoints)
         //1 point per 10 minutes in VC.
-        leveling.voicePoints += (timeInVC / 60*100).toInt()
+        leveling.voicePoints += (timeInVC / (60*100000)).toInt()
         BotMain.logger.info("New Points: " + leveling.levelingPoints)
         val newLevel = calculateLevel(leveling.levelingPoints)
         if(newLevel > currentLevel){
             DiscordUtils.checkLeveledRoles(member)
-            member.guild.defaultChannel!!.asTextChannel().sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
+            val generalChannels = member.guild.getTextChannelsByName("general", false);
+            generalChannels[0].sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
         }
         //We don't trust Discord to not bug and double call this method so overwrite the time so it doesn't
         //affect us too badly.
