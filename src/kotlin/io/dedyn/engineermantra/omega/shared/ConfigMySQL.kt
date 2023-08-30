@@ -18,7 +18,6 @@ object ConfigMySQL: ConfigFileInterface {
         db_name = ConfigFileJson.get("sql_database") ?: "omega"
         username = ConfigFileJson.get("sql_username") ?: "omega"
         password = ConfigFileJson.get("sql_password") ?: "REDACTED"
-        load()
     }
 
     override fun load() {
@@ -39,8 +38,13 @@ object ConfigMySQL: ConfigFileInterface {
         //TODO: Come back to this, it's going to take a bunch of work to think this through
         return
     }
-    private fun assertIsConnected()
+    private fun assertIsConnected(): Boolean
     {
+        if(BotMain.jda.selfUser.idLong == 1107721065947484302L)
+        {
+            BotMain.logger.warn("BOT IS RUNNING IN DEBUG MODE. ALL SQL REQUESTS WILL FAIL AND RETURN NULL.")
+            return false
+        }
         if(connection.isClosed)
         {
             load()
@@ -49,6 +53,7 @@ object ConfigMySQL: ConfigFileInterface {
             connection.close()
             load()
         }
+        return true
     }
 
     //This should ONLY be called once per SQL server and only by Main through the command line argument
@@ -94,50 +99,66 @@ object ConfigMySQL: ConfigFileInterface {
         )
     }
 
-    fun addStrike(strike: DatabaseObject.Strike)
-    {
-        assertIsConnected()
-        connection.createStatement().executeUpdate("INSERT INTO strikes (userId, serverId, reason, type, points, moderatorId, time) VALUES (${strike.userId}, ${strike.serverId}, \"${strike.reason!!.replace("\"","\\\"").replace("\'","\\\'").substring(0, strike.reason!!.length.coerceAtMost(200))}\", \"${strike.type}\", ${strike.points}, ${strike.moderatorId}, NOW());")
+    fun addStrike(strike: DatabaseObject.Strike) {
+        if (assertIsConnected()) {
+            connection.createStatement().executeUpdate(
+                "INSERT INTO strikes (userId, serverId, reason, type, points, moderatorId, time) VALUES (${strike.userId}, ${strike.serverId}, \"${
+                    strike.reason!!.replace(
+                        "\"",
+                        "\\\""
+                    ).replace("\'", "\\\'").substring(0, strike.reason!!.length.coerceAtMost(200))
+                }\", \"${strike.type}\", ${strike.points}, ${strike.moderatorId}, NOW());"
+            )
+        }
     }
 
-    fun updateStrike(strikeId: Long, reason: String?, points: Int?){
-        assertIsConnected()
-        if(reason != null) {
-            connection.createStatement().executeUpdate("UPDATE strikes SET reason=\"${
-                reason.replace("\"", "\\\"").replace("\'", "\\\'").substring(0, reason.length.coerceAtMost(200))
-            }\" WHERE strikeId=$strikeId")
-        }
-        if(points != null) {
-            connection.createStatement().executeUpdate("UPDATE strikes SET points=${points} WHERE strikeId=$strikeId")
+    fun updateStrike(strikeId: Long, reason: String?, points: Int?) {
+        if (assertIsConnected()) {
+            if (reason != null) {
+                connection.createStatement().executeUpdate(
+                    "UPDATE strikes SET reason=\"${
+                        reason.replace("\"", "\\\"").replace("\'", "\\\'").substring(0, reason.length.coerceAtMost(200))
+                    }\" WHERE strikeId=$strikeId"
+                )
+            }
+            if (points != null) {
+                connection.createStatement()
+                    .executeUpdate("UPDATE strikes SET points=${points} WHERE strikeId=$strikeId")
+            }
         }
     }
 
     fun getStrikes(user: Long, server: Long): Array<DatabaseObject.Strike>
     {
-        assertIsConnected()
-        val query = connection.createStatement().executeQuery("SELECT strikeId, userId, serverId, reason, points, type, moderatorId, time FROM strikes WHERE userId=${user} AND serverId=$server;")
-        val returnType = mutableListOf<DatabaseObject.Strike>()
-        while(query.next()){
-            returnType.add(
-                DatabaseObject.Strike(
-                    query.getLong("strikeId"),
-                    query.getLong("userId"),
-                    query.getLong("serverId"),
-                    query.getString("type"),
-                    query.getString("reason"),
-                    query.getInt("points"),
-                    query.getLong("moderatorId"),
-                    query.getTimestamp("time")
+        if(assertIsConnected()) {
+            val query = connection.createStatement()
+                .executeQuery("SELECT strikeId, userId, serverId, reason, points, type, moderatorId, time FROM strikes WHERE userId=${user} AND serverId=$server;")
+            val returnType = mutableListOf<DatabaseObject.Strike>()
+            while (query.next()) {
+                returnType.add(
+                    DatabaseObject.Strike(
+                        query.getLong("strikeId"),
+                        query.getLong("userId"),
+                        query.getLong("serverId"),
+                        query.getString("type"),
+                        query.getString("reason"),
+                        query.getInt("points"),
+                        query.getLong("moderatorId"),
+                        query.getTimestamp("time")
+                    )
                 )
-            )
+            }
+            return returnType.toTypedArray()
         }
-        return returnType.toTypedArray()
+        return arrayOf();
     }
 
     fun addBoosterItem(userId: Long, serverId: Long, roleId: Long)
     {
-        assertIsConnected()
-        connection.createStatement().executeUpdate("INSERT INTO boosters (userId, serverId, roleId) VALUES ($userId, $serverId, $roleId);")
+        if(assertIsConnected()) {
+            connection.createStatement()
+                .executeUpdate("INSERT INTO boosters (userId, serverId, roleId) VALUES ($userId, $serverId, $roleId);")
+        }
     }
     fun updateBoosterItem()
     {
@@ -145,107 +166,142 @@ object ConfigMySQL: ConfigFileInterface {
     }
     fun getBoosterItem(userId: Long, serverId: Long): DatabaseObject.BoosterPerks?
     {
-        assertIsConnected()
-        val query = connection.createStatement().executeQuery("SELECT boosterId, userId, serverId, roleId FROM boosters WHERE userId=${userId} AND serverId=$serverId;")
-        return if(!query.next()){
-            null
-        } else{
-            DatabaseObject.BoosterPerks(query.getInt("boosterId"), query.getLong("userId"), query.getLong("serverId"), query.getLong("roleId"))
-        }
-    }
-
-    fun getBoosters(serverId: Long): Array<DatabaseObject.BoosterPerks>
-    {
-        assertIsConnected()
-        val query = connection.createStatement().executeQuery("SELECT boosterId, userId, serverId, roleId FROM boosters WHERE serverId=$serverId;")
-        val returnType = mutableListOf<DatabaseObject.BoosterPerks>()
-        while(query.next()){
-            returnType.add(
+        if(assertIsConnected()) {
+            val query = connection.createStatement()
+                .executeQuery("SELECT boosterId, userId, serverId, roleId FROM boosters WHERE userId=${userId} AND serverId=$serverId;")
+            return if (!query.next()) {
+                null
+            } else {
                 DatabaseObject.BoosterPerks(
                     query.getInt("boosterId"),
                     query.getLong("userId"),
                     query.getLong("serverId"),
                     query.getLong("roleId")
                 )
-            )
+            }
         }
-        return returnType.toTypedArray()
+        return DatabaseObject.BoosterPerks(0,0,0,0)
+    }
+
+    fun getBoosters(serverId: Long): Array<DatabaseObject.BoosterPerks>
+    {
+        if(assertIsConnected()) {
+            val query = connection.createStatement()
+                .executeQuery("SELECT boosterId, userId, serverId, roleId FROM boosters WHERE serverId=$serverId;")
+            val returnType = mutableListOf<DatabaseObject.BoosterPerks>()
+            while (query.next()) {
+                returnType.add(
+                    DatabaseObject.BoosterPerks(
+                        query.getInt("boosterId"),
+                        query.getLong("userId"),
+                        query.getLong("serverId"),
+                        query.getLong("roleId")
+                    )
+                )
+            }
+            return returnType.toTypedArray()
+        }
+        return arrayOf()
     }
 
     fun removeBooster(obj: DatabaseObject.BoosterPerks)
     {
-        assertIsConnected()
-        connection.createStatement().executeUpdate("DELETE FROM boosters WHERE boosterId=${obj.id};")
+        if(assertIsConnected()) {
+            connection.createStatement().executeUpdate("DELETE FROM boosters WHERE boosterId=${obj.id};")
+
+        }
     }
 
     //Implements new username claiming system
     fun getUsernames(id: Long): DatabaseObject.Usernames? {
-        assertIsConnected()
-        val query = connection.createStatement().executeQuery("SELECT * from usernames WHERE uid=$id;")
-        if(!query.next()){
-            return null
+        if(assertIsConnected()) {
+            val query = connection.createStatement().executeQuery("SELECT * from usernames WHERE uid=$id;")
+            if (!query.next()) {
+                return null
+            }
+            return DatabaseObject.Usernames(id, query.getString("json"))
         }
-        return DatabaseObject.Usernames(id, query.getString("json"))
+        return null
     }
 
     fun storeUsernames(uid: Long, jsonStr: String) {
-        assertIsConnected()
-        //If they don't exist, getUsernames returns null. If they do exist, we just update the record already existing
-        if(getUsernames(uid) == null) {
-            connection.createStatement().executeUpdate("INSERT INTO usernames (uid, json) VALUES ($uid, \"${jsonStr.replace("\"", "\\\"").replace("\'", "\\\'")}\")")
-        }
-        else{
-            connection.createStatement().executeUpdate("UPDATE usernames SET json=$jsonStr WHERE uid=$uid")
+        if(assertIsConnected()) {
+            //If they don't exist, getUsernames returns null. If they do exist, we just update the record already existing
+            if (getUsernames(uid) == null) {
+                connection.createStatement().executeUpdate(
+                    "INSERT INTO usernames (uid, json) VALUES ($uid, \"${
+                        jsonStr.replace("\"", "\\\"").replace("\'", "\\\'")
+                    }\")"
+                )
+            } else {
+                connection.createStatement().executeUpdate("UPDATE usernames SET json=$jsonStr WHERE uid=$uid")
+            }
         }
     }
 
     fun deleteUsernames(uid: Long) {
-        assertIsConnected()
-        connection.createStatement().executeUpdate("DELETE FROM usernames WHERE uid=$uid")
+        if(assertIsConnected()) {
+            connection.createStatement().executeUpdate("DELETE FROM usernames WHERE uid=$uid")
+        }
     }
 
-    fun roleBanUser(uid: Long, gid: Long, rid: Long)
-    {
-        assertIsConnected()
-        connection.createStatement().executeUpdate("INSERT INTO rolebans (uid, gid, rid) VALUES ($uid, $gid, $rid);")
+    fun roleBanUser(uid: Long, gid: Long, rid: Long) {
+        if (assertIsConnected()) {
+            connection.createStatement()
+                .executeUpdate("INSERT INTO rolebans (uid, gid, rid) VALUES ($uid, $gid, $rid);")
+        }
     }
 
-    fun removeRoleBan(uid: Long, rid: Long)
-    {
-        assertIsConnected()
-        connection.createStatement().executeUpdate("DELETE FROM rolebans WHERE uid=$uid AND rid=$rid;")
+    fun removeRoleBan(uid: Long, rid: Long) {
+        if (assertIsConnected()) {
+            connection.createStatement().executeUpdate("DELETE FROM rolebans WHERE uid=$uid AND rid=$rid;")
+        }
     }
 
     fun checkHasRoleBan(uid: Long, rid: Long): Boolean
     {
-        assertIsConnected()
-        val query = connection.createStatement().executeQuery("SELECT uid, rid FROM rolebans WHERE uid=$uid AND rid=$rid;")
-        return query.next()
+        if(assertIsConnected()) {
+            val query =
+                connection.createStatement().executeQuery("SELECT uid, rid FROM rolebans WHERE uid=$uid AND rid=$rid;")
+            return query.next()
+        }
+        return false
     }
 
     fun getLevelingPoints(userId: Long, serverId: Long): DatabaseObject.Leveling?{
-        assertIsConnected()
-        val query = connection.createStatement().executeQuery("SELECT * FROM leveling WHERE userId=$userId AND serverId=$serverId;")
-        if(!query.next()){
-            return null
+        if(assertIsConnected()) {
+            val query = connection.createStatement()
+                .executeQuery("SELECT * FROM leveling WHERE userId=$userId AND serverId=$serverId;")
+            if (!query.next()) {
+                return null
+            }
+            return DatabaseObject.Leveling(
+                query.getInt("levelingId"),
+                userId,
+                serverId,
+                query.getInt("voicePoints"),
+                query.getInt("textPoints")
+            )
         }
-        return DatabaseObject.Leveling(query.getInt("levelingId"), userId, serverId, query.getInt("voicePoints"), query.getInt("textPoints"))
+        return null
     }
 
     fun getLevelingPointsOrDefault(userId: Long, serverId: Long): DatabaseObject.Leveling {
         return getLevelingPoints(userId, serverId) ?: DatabaseObject.Leveling(0, userId, serverId, 0, 0)
     }
-    fun updateLevelingPoints(obj: DatabaseObject.Leveling)
-    {
+    fun updateLevelingPoints(obj: DatabaseObject.Leveling) {
         BotMain.logger.info("textPoints: ${obj.textPoints}, voicePoints: ${obj.voicePoints}")
-        assertIsConnected()
-        if(getLevelingPoints(obj.userId, obj.serverId) == null)
-        {
-            connection.createStatement().executeUpdate("INSERT INTO leveling (userId, serverId, voicePoints, textPoints) VALUES (${obj.userId}, ${obj.serverId}, ${obj.voicePoints}, ${obj.textPoints});")
-            return
+        if (assertIsConnected()) {
+            if (getLevelingPoints(obj.userId, obj.serverId) == null) {
+                connection.createStatement()
+                    .executeUpdate("INSERT INTO leveling (userId, serverId, voicePoints, textPoints) VALUES (${obj.userId}, ${obj.serverId}, ${obj.voicePoints}, ${obj.textPoints});")
+                return
+            }
+            connection.createStatement()
+                .executeUpdate("UPDATE leveling SET textPoints=${obj.textPoints} WHERE levelingId=${obj.levelingId};")
+            connection.createStatement()
+                .executeUpdate("UPDATE leveling SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId};")
         }
-        connection.createStatement().executeUpdate("UPDATE leveling SET textPoints=${obj.textPoints} WHERE levelingId=${obj.levelingId};")
-        connection.createStatement().executeUpdate("UPDATE leveling SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId};")
     }
 
 
