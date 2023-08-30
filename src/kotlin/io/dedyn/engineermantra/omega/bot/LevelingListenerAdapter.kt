@@ -64,6 +64,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
         //1 point per 10 minutes in VC.
         leveling.voicePoints += (timeInVC / (60*100000)).toInt()
         BotMain.logger.info("New Points: " + leveling.levelingPoints)
+        ConfigMySQL.updateLevelingPoints(leveling)
         val newLevel = calculateLevel(leveling.levelingPoints)
         if(newLevel > currentLevel){
             DiscordUtils.checkLeveledRoles(member)
