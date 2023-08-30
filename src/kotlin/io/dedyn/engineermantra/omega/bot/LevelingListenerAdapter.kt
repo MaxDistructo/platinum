@@ -70,7 +70,13 @@ class LevelingListenerAdapter: ListenerAdapter() {
         val newLevel = calculateLevel(leveling.levelingPoints)
         if(newLevel > currentLevel){
             DiscordUtils.checkLeveledRoles(member)
-            val generalChannels = member.guild.getTextChannelsByName("general", false);
+            val generalChannels = member.guild.getTextChannelsByName("general", false)
+            //SC Override since the general channel doesn't fit the normal case.
+            if(member.guild.idLong == 967140876298092634L)
+            {
+                generalChannels.clear()
+                generalChannels.add(member.guild.getTextChannelById(967140876298092637)!!)
+            }
             generalChannels[0].sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
         }
         //We don't trust Discord to not bug and double call this method so overwrite the time so it doesn't
@@ -84,7 +90,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
         if(event.channelJoined != null && event.channelLeft != null)
         {
             //On joining the AFK channel from another channel, grant points earned and stop counting.
-            if(event.channelJoined!!.asVoiceChannel().name == "AFK")
+            if(event.channelJoined!!.asVoiceChannel().idLong == event.guild.afkChannel!!.idLong)
             {
                 grantPoints(event.member)
             }
