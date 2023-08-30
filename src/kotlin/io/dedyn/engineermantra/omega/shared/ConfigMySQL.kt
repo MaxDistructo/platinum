@@ -239,11 +239,11 @@ object ConfigMySQL: ConfigFileInterface {
         assertIsConnected()
         if(getLevelingPoints(obj.userId, obj.serverId) == null)
         {
-            connection.createStatement().executeUpdate("INSERT INTO usernames (userId, serverId, voicePoints, textPoints) VALUES (${obj.userId}, ${obj.serverId}, ${obj.voicePoints}, ${obj.textPoints})")
+            connection.createStatement().executeUpdate("INSERT INTO leveling (userId, serverId, voicePoints, textPoints) VALUES (${obj.userId}, ${obj.serverId}, ${obj.voicePoints}, ${obj.textPoints})")
             return
         }
-        connection.createStatement().executeUpdate("UPDATE usernames SET textPoints=${obj.textPoints} WHERE levelingId=${obj.levelingId}")
-        connection.createStatement().executeUpdate("UPDATE usernames SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId}")
+        connection.createStatement().executeUpdate("UPDATE leveling SET textPoints=${obj.textPoints} WHERE levelingId=${obj.levelingId}")
+        connection.createStatement().executeUpdate("UPDATE leveling SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId}")
     }
 
 
