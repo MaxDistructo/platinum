@@ -67,23 +67,6 @@ object BotMain {
                     )
             ).complete()
         }
-        if(!commandNames.contains("set")) {
-            jda.upsertCommand(
-                Commands.slash("set", "Set a config value")
-                    .setGuildOnly(true)
-                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER))
-                    .addSubcommands(
-                        SubcommandData("suggestion_channel", "Set the suggestion channel")
-                            .addOption(
-                                OptionType.CHANNEL,
-                                "channel",
-                                "The channel to set as the suggestion channel",
-                                true,
-                                false
-                            )
-                    )
-            ).complete()
-        }
         if(!commandNames.contains("role")) {
             jda.upsertCommand(
                 Commands.slash("role", "Set or create your booster role. If you're not a booster, this will not work.")
@@ -162,31 +145,6 @@ object BotMain {
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
             ).complete()
         }
-        if(!commandNames.contains("username")) {
-            jda.upsertCommand(
-                Commands.slash(
-                    "username",
-                    "Show the known usernames for a member. If a game is not provided, this will show all known usernames"
-                )
-                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                    .addOption(OptionType.USER, "user", "What user would you like to see usernames for", true, false)
-                    .addOption(
-                        OptionType.STRING,
-                        "game",
-                        "What game do you want to see the username from?",
-                        false,
-                        true
-                    )
-            ).complete()
-        }
-        if(!commandNames.contains("setusername")) {
-            jda.upsertCommand(
-                Commands.slash("setusername", "Set your username for a game")
-                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                    .addOption(OptionType.STRING, "username", "The username to set", true, false)
-                    .addOption(OptionType.STRING, "game", "The game to set your username as", true, true)
-            ).complete()
-        }
         if(!commandNames.contains("poll")) {
             jda.upsertCommand(
                 Commands.slash("poll", "Create a poll")
@@ -211,6 +169,13 @@ object BotMain {
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                     .setGuildOnly(true)
                     .addOption(OptionType.STRING, "prompt", "What do you want to ask about?", true, false)
+            ).complete()
+        }
+        if(!commandNames.contains("level")) {
+            jda.upsertCommand(
+                Commands.slash("level", "View your level")
+                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+                    .setGuildOnly(true)
             ).complete()
         }
         jda.getGuildById(967140876298092634)!!.upsertCommand(

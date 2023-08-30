@@ -1,10 +1,7 @@
 package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.bot.BotMain.logger
-import io.dedyn.engineermantra.omega.shared.ConfigFileJson
-import io.dedyn.engineermantra.omega.shared.ConfigMySQL
-import io.dedyn.engineermantra.omega.shared.ConfigFileUsernames
-import io.dedyn.engineermantra.omega.shared.DatabaseObject
+import io.dedyn.engineermantra.omega.shared.*
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.emoji.Emoji
@@ -25,6 +22,7 @@ import java.net.URI
 import java.sql.Timestamp
 import java.time.Instant
 import javax.imageio.ImageIO
+import kotlin.math.pow
 
 class SlashCommandListenerAdapter: ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
@@ -48,6 +46,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "vote" -> createPoll(event)
             "md" -> internalCommand(event)
             "agree" -> ruleAgreement(event)
+            "level" -> checkLevel(event)
             else -> println("Command not found")
         }
     }
@@ -515,6 +514,20 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         event.reply("Do you agree to the rules specified?")
             .addActionRow(Button.primary("agree", "Agree"), Button.danger("disagree", "Disagree"))
             .queue()
+    }
+    fun checkLevel(event: SlashCommandInteractionEvent)
+    {
+        val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.user.idLong, event.guild!!.idLong)
+        var level = Utils.calculateLevel(leveling.levelingPoints)
+        val expCurrent = (6/5 * level.toDouble().pow(3) - 15 * level.toDouble().pow(2) + 100 * level.toDouble() - 140).toInt()
+        level++
+        val expNeeded = (6/5 * level.toDouble().pow(3) - 15 * level.toDouble().pow(2) + 100 * level.toDouble() - 140).toInt()
+        event.replyEmbeds(DiscordUtils.simpleTitledEmbed(event.member!!, "Leveling Stats",
+            "You are currently level ${Utils.calculateLevel(leveling.levelingPoints)}\nTotal Points: ${leveling.levelingPoints}\n"
+                    +  "Points from Messages: ${leveling.textPoints}\nPoints from Voice Chat: ${leveling.voicePoints}\n\n"
+                    +  "Points to next level: ${expNeeded - expCurrent}",
+            event.guild!!
+        )).queue()
     }
 }
 
