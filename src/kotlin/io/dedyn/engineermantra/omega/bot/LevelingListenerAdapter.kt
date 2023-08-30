@@ -27,29 +27,26 @@ class LevelingListenerAdapter: ListenerAdapter() {
         {
             val currentTime = System.currentTimeMillis()
             val difference = currentTime - textUserList[event.member!!.idLong]!!
-            if(difference < 60*100)
+            if(difference < 30*100)
             {
                 return
             }
         }
         val random = Random.Default
-        if((random.nextInt() % 10) == 1)
-        {
-            BotMain.logger.info("Granting Text Points to " + event.author.effectiveName)
-            val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.author.idLong, event.guild.idLong)
-            BotMain.logger.info("Current Points: " + leveling.textPoints)
-            val currentLevel = calculateLevel(leveling.levelingPoints)
-            leveling.textPoints += 1
-            BotMain.logger.info("New Points: " + leveling.levelingPoints)
-            ConfigMySQL.updateLevelingPoints(leveling)
-            val newLevel = calculateLevel(leveling.levelingPoints)
-            //We are going to use an exponential curve on leveling
-            if(newLevel > currentLevel){
-                DiscordUtils.checkLeveledRoles(event.member!!)
-                event.message.reply("${event.member!!.asMention} has leveled up to $newLevel!").queue()
-            }
-            textUserList[event.member!!.idLong] = System.currentTimeMillis()
+        BotMain.logger.info("Granting Text Points to " + event.author.effectiveName)
+        val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.author.idLong, event.guild.idLong)
+        BotMain.logger.info("Current Points: " + leveling.textPoints)
+        val currentLevel = calculateLevel(leveling.levelingPoints)
+        leveling.textPoints += random.nextInt(1, 10)
+        BotMain.logger.info("New Points: " + leveling.levelingPoints)
+        ConfigMySQL.updateLevelingPoints(leveling)
+        val newLevel = calculateLevel(leveling.levelingPoints)
+        //We are going to use an exponential curve on leveling
+        if(newLevel > currentLevel){
+            DiscordUtils.checkLeveledRoles(event.member!!)
+            event.message.reply("${event.member!!.asMention} has leveled up to $newLevel!").queue()
         }
+        textUserList[event.member!!.idLong] = System.currentTimeMillis()
     }
     val userList = HashMap<Long,Long>()
     private fun grantPoints(member: Member)
