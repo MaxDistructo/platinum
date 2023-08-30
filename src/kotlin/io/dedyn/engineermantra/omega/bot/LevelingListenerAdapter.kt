@@ -23,7 +23,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
 	    {
 		    println("Member is null. (THIS SHOULD NEVER HAPPEN)");
 	    }
-	if(textUserList.containsKey(event.member!!.idLong))
+	    if(textUserList.containsKey(event.member!!.idLong))
         {
             val currentTime = System.currentTimeMillis()
             val difference = currentTime - textUserList[event.member!!.idLong]!!
@@ -35,9 +35,12 @@ class LevelingListenerAdapter: ListenerAdapter() {
         val random = Random.Default
         if((random.nextInt() % 10) == 1)
         {
+            BotMain.logger.info("Granting points to " + event.author.effectiveName)
             val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.author.idLong, event.guild.idLong)
+            BotMain.logger.info("Current Points: " + leveling.voicePoints)
             val currentLevel = calculateLevel(leveling.levelingPoints)
             leveling.textPoints += 1
+            BotMain.logger.info("New Points: " + leveling.voicePoints)
             ConfigMySQL.updateLevelingPoints(leveling)
             val newLevel = calculateLevel(leveling.levelingPoints)
             //We are going to use an exponential curve on leveling
@@ -51,13 +54,16 @@ class LevelingListenerAdapter: ListenerAdapter() {
     val userList = HashMap<Long,Long>()
     private fun grantPoints(member: Member)
     {
+        BotMain.logger.info("Granting points to " + member.effectiveName)
         val leaveTime = System.currentTimeMillis()
         val joinTime = userList[member.idLong] ?: return
         val timeInVC = leaveTime - joinTime
         val leveling = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong)
         val currentLevel = calculateLevel(leveling.levelingPoints)
+        BotMain.logger.info("Current Points: " + leveling.voicePoints)
         //1 point per 10 minutes in VC.
         leveling.voicePoints += (timeInVC / 60*100).toInt()
+        BotMain.logger.info("New Points: " + leveling.voicePoints)
         val newLevel = calculateLevel(leveling.levelingPoints)
         if(newLevel > currentLevel){
             DiscordUtils.checkLeveledRoles(member)
@@ -79,7 +85,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
                 grantPoints(event.member)
             }
             //Ignore this case for now, we just need to catch it at the start to not mistake this as a DC.
-            return;
+            return
         }
         //User Disconnected
         else if(event.channelJoined != null)
