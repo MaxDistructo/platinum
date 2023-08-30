@@ -19,7 +19,15 @@ class LevelingListenerAdapter: ListenerAdapter() {
             return
         }
         //Check if the user has sent a message within the last 60 seconds. Prevent spamming for points.
-        if(textUserList.containsKey(event.member!!.idLong))
+        if(event.member == null)
+	{
+		println("Member is null.");	
+	}
+	if(event.guild == null)
+	{
+		println("Guild is null.");
+	}
+	if(textUserList.containsKey(event.member!!.idLong))
         {
             val currentTime = System.currentTimeMillis()
             val difference = currentTime - textUserList[event.member!!.idLong]!!
