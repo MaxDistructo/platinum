@@ -72,15 +72,15 @@ class LevelingListenerAdapter: ListenerAdapter() {
         ConfigMySQL.updateLevelingPoints(leveling)
         val newLevel = calculateLevel(leveling.levelingPoints)
         if(newLevel > currentLevel){
-            DiscordUtils.checkLeveledRoles(member)
-            val generalChannels = member.guild.getTextChannelsByName("general", false)
-            //SC Override since the general channel doesn't fit the normal case.
-            if(member.guild.idLong == 967140876298092634L)
-            {
-                generalChannels.clear()
-                generalChannels.add(member.guild.getTextChannelById(967145650158436372)!!)
+            if(DiscordUtils.checkLeveledRoles(member)) {
+                val generalChannels = member.guild.getTextChannelsByName("general", false)
+                //SC Override since the general channel doesn't fit the normal case.
+                if (member.guild.idLong == 967140876298092634L) {
+                    generalChannels.clear()
+                    generalChannels.add(member.guild.getTextChannelById(967145650158436372)!!)
+                }
+                generalChannels[0].sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
             }
-            generalChannels[0].sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
         }
         //We don't trust Discord to not bug and double call this method so overwrite the time so it doesn't
         //affect us too badly.

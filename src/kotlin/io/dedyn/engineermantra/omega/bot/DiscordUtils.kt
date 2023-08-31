@@ -145,10 +145,9 @@ object DiscordUtils {
         val level = Utils.calculateLevel(leveling.levelingPoints)
         if (level > 10) {
             guild.addRoleToMember(member, guild.getRolesByName("User", false)[0]).queue()
-            return true;
-        }
-        if(level > 25){
-            guild.addRoleToMember(member, guild.getRolesByName("Trusted User", false)[0]).queue()
+            if(level > 25) {
+                guild.addRoleToMember(member, guild.getRolesByName("Trusted User", false)[0]).queue()
+            }
             return true
         }
         return false
