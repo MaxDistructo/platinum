@@ -72,7 +72,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
             if(member.guild.idLong == 967140876298092634L)
             {
                 generalChannels.clear()
-                generalChannels.add(member.guild.getTextChannelById(967140876298092637)!!)
+                generalChannels.add(member.guild.getTextChannelById(967145650158436372)!!)
             }
             generalChannels[0].sendMessage("${member.asMention} has leveled up to $newLevel!").queue()
         }
