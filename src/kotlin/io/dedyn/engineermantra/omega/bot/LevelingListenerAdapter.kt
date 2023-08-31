@@ -23,6 +23,11 @@ class LevelingListenerAdapter: ListenerAdapter() {
 	    {
 		    println("Member is null. (THIS SHOULD NEVER HAPPEN)");
 	    }
+        //IGNORE BOTS
+        if(event.member!!.user.isBot)
+        {
+            return
+        }
 	    if(textUserList.containsKey(event.member!!.idLong))
         {
             val currentTime = System.currentTimeMillis()
@@ -43,8 +48,9 @@ class LevelingListenerAdapter: ListenerAdapter() {
         val newLevel = calculateLevel(leveling.levelingPoints)
         //We are going to use an exponential curve on leveling
         if(newLevel > currentLevel){
-            DiscordUtils.checkLeveledRoles(event.member!!)
-            event.message.reply("${event.member!!.asMention} has leveled up to $newLevel!").queue()
+            if(DiscordUtils.checkLeveledRoles(event.member!!)) {
+                event.message.reply("${event.member!!.asMention} has leveled up to $newLevel!").queue()
+            }
         }
         textUserList[event.member!!.idLong] = System.currentTimeMillis()
     }

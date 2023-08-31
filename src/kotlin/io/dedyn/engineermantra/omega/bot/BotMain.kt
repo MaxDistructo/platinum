@@ -176,6 +176,7 @@ object BotMain {
                 Commands.slash("level", "View your level")
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                     .setGuildOnly(true)
+                    .addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
         jda.getGuildById(967140876298092634)!!.upsertCommand(

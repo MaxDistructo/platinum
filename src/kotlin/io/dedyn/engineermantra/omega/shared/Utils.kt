@@ -24,13 +24,14 @@ object Utils {
         //This leveling is fairly good since users are able to level up fast early, but it slows down as they get up
         //in level.
         //We calculate the double of the level then output an Int
-        var n = 0.0
+        var n = 2.0
         while(n < 100)
         {
-            val expForLevel = (6/5 * n.pow(3) - 15 * n.pow(2) + 100 * n - 140).toInt()
+            val expForLevel = ((6.0/5) * n * n * n - 15 * n * n + 100 * n - 140)
             //exp needed, n=10: 560
             //exp will be greater than level until we find the level where it's greater than us
             //decrement the value by 1 to get the actual level and return that.
+
             if(exp < expForLevel)
             {
                 // It takes more XP than what we have to get this level.

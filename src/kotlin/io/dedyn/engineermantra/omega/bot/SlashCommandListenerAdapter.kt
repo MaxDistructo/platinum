@@ -47,6 +47,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "md" -> internalCommand(event)
             "agree" -> ruleAgreement(event)
             "level" -> checkLevel(event)
+            "level2" -> checkLevel(event)
             else -> println("Command not found")
         }
     }
@@ -517,7 +518,19 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     }
     fun checkLevel(event: SlashCommandInteractionEvent)
     {
-        val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.user.idLong, event.guild!!.idLong)
+        val userOption = event.getOption("user")
+        var user: User? = null
+        if(userOption != null)
+        {
+            user = userOption.asUser
+        }
+        val leveling: DatabaseObject.Leveling;
+        if(user == null) {
+            leveling = ConfigMySQL.getLevelingPointsOrDefault(event.user.idLong, event.guild!!.idLong)
+        }
+        else{
+            leveling = ConfigMySQL.getLevelingPointsOrDefault(user.idLong, event.guild!!.idLong)
+        }
         var level = Utils.calculateLevel(leveling.levelingPoints)
         val expCurrent = (6/5 * level.toDouble().pow(3) - 15 * level.toDouble().pow(2) + 100 * level.toDouble() - 140).toInt()
         level++
