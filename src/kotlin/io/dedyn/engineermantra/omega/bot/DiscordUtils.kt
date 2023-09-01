@@ -148,6 +148,9 @@ object DiscordUtils {
             if(level > 25) {
                 guild.addRoleToMember(member, guild.getRolesByName("Trusted User", false)[0]).queue()
             }
+        }
+        if(level == 10 || level == 25)
+        {
             return true
         }
         return false
