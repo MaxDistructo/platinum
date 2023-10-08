@@ -227,7 +227,6 @@ class LoggerListenerAdapter : ListenerAdapter() {
 
     }
 
-
     fun messageEditedEmbed(event: MessageUpdateEvent): MessageEmbed {
         val builder = EmbedBuilder()
 

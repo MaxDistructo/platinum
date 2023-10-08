@@ -2,18 +2,22 @@ package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.shared.ConfigFileUsernames
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
-import io.dedyn.engineermantra.omega.shared.Utils
+import io.dedyn.engineermantra.omega.shared.MessageLevel
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion
+import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.entities.channel.unions.ChannelUnion
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.sourceforge.tess4j.Tesseract
 import java.io.File
+import java.time.Instant
 
 class SCListenerAdapter : ListenerAdapter() {
     override fun onGuildMemberRemove(event: GuildMemberRemoveEvent) {
@@ -140,4 +144,32 @@ class SCListenerAdapter : ListenerAdapter() {
         }
     }
 
+    override fun onGuildMemberRoleAdd(event: GuildMemberRoleAddEvent) {
+        if(event.guild.idLong != 967140876298092634)
+        {
+            return
+        }
+        val adminRole = event.guild.getRoleById(967142423534903358)
+        val moderatorRole = event.guild.getRoleById(967142088296767598)
+        val helperRole = event.guild.getRoleById(1073417783326560316)
+        val eventHostRole = event.guild.getRoleById(971038281649238046)
+        if(event.roles.contains(adminRole) || event.roles.contains(moderatorRole) || event.roles.contains(helperRole) || event.roles.contains(eventHostRole))
+        {
+            val loggingChannel = event.guild.getTextChannelById(967156927731748914)
+            loggingChannel!!.sendMessageEmbeds(staffRoleAddEmbed(event.member, event.roles[0]))
+        }
+    }
+
+    fun staffRoleAddEmbed(member: Member, role: Role): MessageEmbed {
+        val builder = EmbedBuilder()
+        val authorAvatar = member.effectiveAvatarUrl
+        builder.setTimestamp(Instant.now())
+        //The URL here is translated by the Discord client into a #channel > Message link
+        builder.setTitle("Added to Staff Role: @" + role.name)
+        //builder.setDescription("via <@762217899355013120>")
+        //builder.setDescription("**Previous**: ${previous?.content ?: "Unavailable"}\n**Now:**: ${event.message.contentRaw}")
+        builder.setColor(MessageLevel.Level.MODIFY.color)
+        builder.setAuthor(member.effectiveName, authorAvatar, authorAvatar)
+        return builder.build()
+    }
 }
