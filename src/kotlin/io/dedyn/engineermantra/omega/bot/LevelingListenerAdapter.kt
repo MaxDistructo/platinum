@@ -57,6 +57,10 @@ class LevelingListenerAdapter: ListenerAdapter() {
     val userList = HashMap<Long,Long>()
     private fun grantPoints(member: Member)
     {
+        if(member.user.isBot)
+        {
+            return
+        }
         BotMain.logger.info("Granting Voice Points to " + member.effectiveName)
         val leaveTime = System.currentTimeMillis()
         val joinTime = userList[member.idLong] ?: return

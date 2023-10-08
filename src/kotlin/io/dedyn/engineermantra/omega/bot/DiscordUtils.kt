@@ -143,9 +143,9 @@ object DiscordUtils {
         val guild = member.guild
         val leveling = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, guild.idLong)
         val level = Utils.calculateLevel(leveling.levelingPoints)
-        if (level > 10) {
+        if (level >= 10) {
             guild.addRoleToMember(member, guild.getRolesByName("User", false)[0]).queue()
-            if(level > 25) {
+            if(level >= 25) {
                 guild.addRoleToMember(member, guild.getRolesByName("Trusted User", false)[0]).queue()
             }
         }
