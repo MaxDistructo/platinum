@@ -34,8 +34,8 @@ dependencies {
     implementation(group = "org.json", name = "json", version = "20230227")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.6")
     //Due to bugs in the latest beta, we want to pull the latest commit from Jitpack instead of Maven.
-    implementation(group = "com.github.discord-jda", name = "JDA", version = "79b1b560b1")
-    //implementation(group = "net.dv8tion", name = "JDA", version = "5.0.0-beta.+")
+    //implementation(group = "com.github.discord-jda", name = "JDA", version = "79b1b560b1")
+    implementation(group = "net.dv8tion", name = "JDA", version = "5.0.0-beta.15")
     implementation(group = "club.minnced", name = "discord-webhooks", version = "0.8.2")
     implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.1.4")
     implementation(group = "net.java.dev.jna", name = "jna", version = "5.13.0")
