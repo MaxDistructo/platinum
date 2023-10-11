@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${providers.gradleProperty("KOTLIN_VERSION").get()}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
     }
 }
 val KOTLIN_VERSION = providers.gradleProperty("KOTLIN_VERSION").get()
@@ -29,7 +29,7 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = providers.gradleProperty("KOTLIN_VERSION").get())
+    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = 1.9.10)
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.7.3")
     implementation(group = "org.json", name = "json", version = "20230618")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.11")
