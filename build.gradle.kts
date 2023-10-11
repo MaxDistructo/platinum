@@ -40,7 +40,7 @@ dependencies {
     implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.1.4")
     implementation(group = "net.java.dev.jna", name = "jna", version = "5.13.0")
     implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.13.0")
-    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.7.0")
+    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.8.0")
 //implementation(kotlin("stdlib-jdk8"))
 }
 
