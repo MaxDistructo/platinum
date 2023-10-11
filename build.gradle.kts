@@ -12,7 +12,7 @@ buildscript {
 val KOTLIN_VERSION = providers.gradleProperty("KOTLIN_VERSION").get()
 plugins {
     kotlin("jvm") version "1.9.10"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    //id("com.github.johnrengelman.shadow") version "7.1.2"
     //id "com.github.ben-manes.versions" version "0.20.0"
     //id 'com.sedmelluq.jdaction' version '1.0.2'
 }
@@ -29,7 +29,7 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = 1.9.10)
+    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "1.9.10")
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.7.3")
     implementation(group = "org.json", name = "json", version = "20230618")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.11")
