@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM gradle:8.0.2 as builder
+FROM --platform=$BUILDPLATFORM gradle:8.4.0 as builder
 COPY . /platinum
 WORKDIR /platinum
 RUN gradle build
