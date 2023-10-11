@@ -31,7 +31,7 @@ repositories {
 dependencies {
     implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = providers.gradleProperty("KOTLIN_VERSION").get())
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.7.3")
-    implementation(group = "org.json", name = "json", version = "20230227")
+    implementation(group = "org.json", name = "json", version = "20230618")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.11")
     //Due to bugs in the latest beta, we want to pull the latest commit from Jitpack instead of Maven.
     //implementation(group = "com.github.discord-jda", name = "JDA", version = "79b1b560b1")
