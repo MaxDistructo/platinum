@@ -12,6 +12,7 @@ steps:
       - gradle build
   - name: publish
     image: thegeeklab/drone-docker-buildx
+    privileged: true
     settings:
       registry: docker.io
       username:
