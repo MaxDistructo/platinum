@@ -19,10 +19,6 @@ object DatabaseObject {
 
     data class Server(val serverId: Long, val auditChannel: Long)
 
-    //We are using json here so we can have a list of key-value pairs without having to add another column for each
-    //entry.
-    data class Usernames(val userId: Long, val json: String)
-
     data class RoleBannedUser(val banId: Int, val userId: Long, val roleId: Long)
 
     data class Leveling(val levelingId: Int, val userId: Long, val serverId: Long, var voicePoints: Int, var textPoints: Int){

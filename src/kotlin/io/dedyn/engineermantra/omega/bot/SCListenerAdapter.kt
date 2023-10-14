@@ -1,6 +1,5 @@
 package io.dedyn.engineermantra.omega.bot
 
-import io.dedyn.engineermantra.omega.shared.ConfigFileUsernames
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.MessageLevel
 import io.dedyn.engineermantra.omega.shared.Timer
@@ -9,7 +8,6 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.Role
-import net.dv8tion.jda.api.entities.channel.unions.ChannelUnion
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
@@ -28,11 +26,6 @@ class SCListenerAdapter : ListenerAdapter() {
                 ConfigMySQL.removeBooster(booster)
                 break
             }
-        }
-        val usernameConfig = ConfigFileUsernames(event.member!!.idLong)
-        //val loaded = ConfigFileUsernames.load(event.member!!.idLong)
-        if (usernameConfig.load()) {
-            usernameConfig.delete(event.member!!.idLong)
         }
     }
 

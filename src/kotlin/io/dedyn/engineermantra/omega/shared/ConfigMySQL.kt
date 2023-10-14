@@ -89,10 +89,6 @@ object ConfigMySQL: ConfigFileInterface {
                 "serverId BIGINT," +
                 "roleId BIGINT" +
                 ");")
-        connection.createStatement().execute("CREATE TABLE usernames(" +
-                "uid BIGINT PRIMARY KEY NOT NULL UNIQUE," +
-                "json VARCHAR(2048)"+
-                ");")
         connection.createStatement().execute("CREATE TABLE leveling(" +
                 "levelingId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,"+
                 "userId BIGINT," +
@@ -215,40 +211,6 @@ object ConfigMySQL: ConfigFileInterface {
 
         }
     }
-
-    //Implements new username claiming system
-    fun getUsernames(id: Long): DatabaseObject.Usernames? {
-        if(assertIsConnected()) {
-            val query = connection.createStatement().executeQuery("SELECT * from usernames WHERE uid=$id;")
-            if (!query.next()) {
-                return null
-            }
-            return DatabaseObject.Usernames(id, query.getString("json"))
-        }
-        return null
-    }
-
-    fun storeUsernames(uid: Long, jsonStr: String) {
-        if(assertIsConnected()) {
-            //If they don't exist, getUsernames returns null. If they do exist, we just update the record already existing
-            if (getUsernames(uid) == null) {
-                connection.createStatement().executeUpdate(
-                    "INSERT INTO usernames (uid, json) VALUES ($uid, \"${
-                        jsonStr.replace("\"", "\\\"").replace("\'", "\\\'")
-                    }\")"
-                )
-            } else {
-                connection.createStatement().executeUpdate("UPDATE usernames SET json=$jsonStr WHERE uid=$uid")
-            }
-        }
-    }
-
-    fun deleteUsernames(uid: Long) {
-        if(assertIsConnected()) {
-            connection.createStatement().executeUpdate("DELETE FROM usernames WHERE uid=$uid")
-        }
-    }
-
     fun roleBanUser(uid: Long, gid: Long, rid: Long) {
         if (assertIsConnected()) {
             connection.createStatement()

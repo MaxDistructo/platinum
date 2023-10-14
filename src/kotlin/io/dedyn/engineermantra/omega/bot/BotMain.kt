@@ -13,7 +13,7 @@ import java.util.*
 object BotMain {
     val imageProcessing: Boolean = false
     val bot_name = "Omega"
-    lateinit var jda: JDA;
+    lateinit var jda: JDA
     lateinit var logger: Logger
     val messageCache = MessageCache()
     val voiceCache = mutableMapOf<Long, Long>()

@@ -40,8 +40,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "strikes" -> viewStrikes(event)
             "editstrike" -> editStrike(event)
             "audit" -> runAuditing(event)
-            "setusername" -> claimUsername(event)
-            "username" -> listUsernames(event)
             "poll" -> createPoll(event)
             "vote" -> createPoll(event)
             "md" -> internalCommand(event)
@@ -410,61 +408,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         assert(event.isFromGuild)
         event.reply("Audit in progress").queue()
         Auditing.runAuditing(event.jda)
-    }
-
-    fun claimUsername(event: SlashCommandInteractionEvent)
-    {
-        val username = event.getOption("username")!!.asString
-        val game = event.getOption("game")!!.asString
-
-        //This is defining a list of reserved usernames to protect staff. AKA, those who would be commonly impersonated
-        if((event.user.idLong != 228111371965956099L && username.lowercase() == "maxdistructo") ||
-            (event.user.idLong != 146755614557601801L && username.lowercase() == "nugg") ||
-            (event.user.idLong != 146755614557601801L && username.lowercase() == "nugdenug") ||
-            (event.user.idLong != 477187510217474069L && username.lowercase() == "bingo") ||
-            (event.user.idLong != 477187510217474069L && username.lowercase() == "splashylaryn")
-            )
-        {
-            event.reply("Get out of here with that. Don't impersonate.").queue()
-        }
-        else{
-            val usernameConfig = ConfigFileUsernames(event.user.idLong)
-            usernameConfig.load()
-            usernameConfig.set(game, username)
-            usernameConfig.save()
-            event.reply("Username set").queue()
-        }
-    }
-    fun listUsernames(event: SlashCommandInteractionEvent)
-    {
-        val user = event.getOption("user")!!.asUser
-        val game = event.getOption("game")?.asString
-        val usernameConfig = ConfigFileUsernames(user.idLong)
-        usernameConfig.load()
-
-        val usernames = StringBuilder()
-        if(game == null){
-            for(key in usernameConfig.loadedFile.keys())
-            {
-                usernames.append("$key = ${usernameConfig.loadedFile.getString(key)}\n")
-            }
-        }
-        else{
-            if(usernameConfig.get(game) != null) {
-                usernames.append("${user.asMention}'s Username in $game is ${usernameConfig.get(game)}")
-            }
-            else{
-                usernames.append("${user.asMention} has not claimed a username for $game")
-            }
-        }
-        if(!event.isFromGuild) {
-            event.reply("").setEphemeral(true).queue()
-            event.channel.sendMessageEmbeds(DiscordUtils.simpleEmbed(event.user, usernames.toString())).queue()
-        }
-        else{
-            event.reply("").setEphemeral(true).queue()
-            event.channel.sendMessageEmbeds(DiscordUtils.simpleEmbed(event.member!!, usernames.toString(), event.guild!!)).queue()
-        }
     }
 
     fun createPoll(event: SlashCommandInteractionEvent)

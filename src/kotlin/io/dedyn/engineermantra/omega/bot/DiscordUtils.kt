@@ -129,16 +129,6 @@ object DiscordUtils {
         return builder.build()
     }
 
-    //Anti-raid measure, add a role if they pass the raid check.
-    fun giveLeveledRoles(guild: Guild) {
-        if (guild.idLong != 967140876298092634) {
-            return
-        }
-        for (member in guild.members) {
-            checkLeveledRoles(member)
-
-        }
-    }
     fun checkLeveledRoles(member: Member): Boolean {
         val guild = member.guild
         val leveling = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, guild.idLong)
