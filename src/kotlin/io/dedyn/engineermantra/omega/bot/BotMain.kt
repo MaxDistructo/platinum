@@ -1,12 +1,14 @@
 package io.dedyn.engineermantra.omega.bot
 
 import ch.qos.logback.classic.Logger
+import io.dedyn.engineermantra.omega.shared.TimerThread
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
+import java.util.*
 
 object BotMain {
     val bot_name = "Omega"
@@ -15,6 +17,7 @@ object BotMain {
     val messageCache = MessageCache()
     val voiceCache = mutableMapOf<Long, Long>()
     val auditThread = AuditThread()
+    val timerThread = TimerThread()
 
     fun run()
     {
@@ -199,6 +202,7 @@ object BotMain {
 
         logger.info("Finished adding slash commands ")
         auditThread.start()
+        timerThread.start()
     }
 
     class AuditThread: Thread(){
@@ -209,4 +213,5 @@ object BotMain {
             }
         }
     }
+
 }
