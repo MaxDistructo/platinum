@@ -3,6 +3,7 @@ package io.dedyn.engineermantra.omega.bot
 import io.dedyn.engineermantra.omega.shared.ConfigFileUsernames
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.MessageLevel
+import io.dedyn.engineermantra.omega.shared.Timer
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
@@ -149,6 +150,15 @@ class SCListenerAdapter : ListenerAdapter() {
         {
             return
         }
+        staffRoleLog(event)
+        //This is for the Birthday Role. 24 hours after it's applyed, the bot will automatically remove it from the member.
+        if(event.roles[0].idLong == 1129010319432364042)
+        {
+            BotMain.timerThread.registerTimer(Timer({event.guild.removeRoleFromMember(event.member, event.roles[0])}, 24*60*60))
+        }
+    }
+
+    fun staffRoleLog(event: GuildMemberRoleAddEvent){
         val adminRole = event.guild.getRoleById(967142423534903358)
         val moderatorRole = event.guild.getRoleById(967142088296767598)
         val helperRole = event.guild.getRoleById(1073417783326560316)
