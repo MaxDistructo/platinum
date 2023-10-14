@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import java.util.*
 
 object BotMain {
+    val imageProcessing: Boolean = false
     val bot_name = "Omega"
     lateinit var jda: JDA;
     lateinit var logger: Logger

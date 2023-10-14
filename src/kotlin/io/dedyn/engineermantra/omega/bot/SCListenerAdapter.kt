@@ -94,7 +94,7 @@ class SCListenerAdapter : ListenerAdapter() {
                         )
                         return
                     }
-                    if (attachment.isImage) {
+                    if (attachment.isImage && BotMain.imageProcessing) {
                         val tempFile = File.createTempFile("ocr_temp", ".${attachment.fileExtension}")
                         println(tempFile.name)
                         val string = instance.doOCR(attachment.proxy.downloadToFile(tempFile).get())
