@@ -478,23 +478,17 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     fun checkLevel(event: SlashCommandInteractionEvent)
     {
         val userOption = event.getOption("user")
-        var user: User? = null
-        if(userOption != null)
-        {
-            user = userOption.asUser
+        val user: Member? = if(userOption != null) {
+            userOption.asMember
+        } else {
+            event.member
         }
-        val leveling: DatabaseObject.Leveling;
-        if(user == null) {
-            leveling = ConfigMySQL.getLevelingPointsOrDefault(event.user.idLong, event.guild!!.idLong)
-        }
-        else{
-            leveling = ConfigMySQL.getLevelingPointsOrDefault(user.idLong, event.guild!!.idLong)
-        }
+        val leveling: DatabaseObject.Leveling = ConfigMySQL.getLevelingPointsOrDefault(user!!.idLong, event.guild!!.idLong)
         var level = Utils.calculateLevel(leveling.levelingPoints)
         val expCurrent = (6/5 * level.toDouble().pow(3) - 15 * level.toDouble().pow(2) + 100 * level.toDouble() - 140).toInt()
         level++
         val expNeeded = (6/5 * level.toDouble().pow(3) - 15 * level.toDouble().pow(2) + 100 * level.toDouble() - 140).toInt()
-        event.replyEmbeds(DiscordUtils.simpleTitledEmbed(event.member!!, "Leveling Stats",
+        event.replyEmbeds(DiscordUtils.simpleTitledEmbed(user, "Leveling Stats",
             "You are currently level ${Utils.calculateLevel(leveling.levelingPoints)}\nTotal Points: ${leveling.levelingPoints}\n"
                     +  "Points from Messages: ${leveling.textPoints}\nPoints from Voice Chat: ${leveling.voicePoints}\n\n"
                     +  "Points to next level: ${expNeeded - expCurrent}",
