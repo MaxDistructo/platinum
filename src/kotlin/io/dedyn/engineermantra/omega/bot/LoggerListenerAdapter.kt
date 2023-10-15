@@ -15,10 +15,12 @@ import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.entities.channel.unions.ChannelUnion
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
 import net.dv8tion.jda.api.events.guild.override.PermissionOverrideCreateEvent
 import net.dv8tion.jda.api.events.guild.override.PermissionOverrideDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import java.time.Instant
@@ -32,6 +34,10 @@ class LoggerListenerAdapter : ListenerAdapter() {
             val loggingChannel: MessageChannel = BotMain.jda.getGuildChannelById(loggingChannelID) as MessageChannel
             loggingChannel.sendMessageEmbeds(messageEditedEmbed(event)).queue()
         }
+        messageCache.add(event.message)
+    }
+
+    override fun onMessageReceived(event: MessageReceivedEvent) {
         messageCache.add(event.message)
     }
 
@@ -144,8 +150,7 @@ class LoggerListenerAdapter : ListenerAdapter() {
                             event.role!!,
                             event.channel as ChannelUnion,
                             event.permissionOverride.allowed,
-                            event.permissionOverride.denied,
-                            event.permissionOverride.inherit
+                            event.permissionOverride.denied
                         )
                     ).queue()
                 }
@@ -213,8 +218,7 @@ class LoggerListenerAdapter : ListenerAdapter() {
                             event.role!!,
                             event.channel as ChannelUnion,
                             event.permissionOverride.allowed,
-                            event.permissionOverride.denied,
-                            event.permissionOverride.inherit
+                            event.permissionOverride.denied
                         )
                     ).queue()
                 }
@@ -224,7 +228,49 @@ class LoggerListenerAdapter : ListenerAdapter() {
 
     override fun onMessageDelete(event: MessageDeleteEvent)
     {
+        ioScope.launch {
+            var member: Member? = null;
+            event.guild.retrieveAuditLogs()
+                .type(ActionType.MESSAGE_DELETE)
+                .limit(1)
+                .queue { list -> member = event.guild.getMember(list[0].user!!)}
+            if(event.guild.idLong == 967140876298092634L)
+            {
+                println("Guild Verified")
+                val loggingChannel = BotMain.jda.getTextChannelById(967156927731748914L) as MessageChannelUnion
+                val message = messageCache.get(event.messageIdLong)
 
+                //Wait for the audit log response upto 1min.
+                val startWait = Instant.now().epochSecond
+                var waitTime = 0L
+                while(member == null && waitTime < 1000*60)
+                {
+                    waitTime = Instant.now().epochSecond - startWait
+                    Thread.sleep(10)
+                }
+
+                if(message != null && member != null)
+                {
+                    println("Member: ${member!!.effectiveName}, Channel: ${event.channel.name}, Content: ${message.content}")
+                    loggingChannel.sendMessageEmbeds(messageDeletedEmbed(member!!, event.channel, message.content)).queue()
+                }
+                else if(member == null && message != null)
+                {
+                    println("assuming self deleted message")
+                    loggingChannel.sendMessageEmbeds(messageDeletedEmbed(event.guild.getMemberById(message.author)!!, event.channel, message.content)).queue()
+                }
+                else{
+                    if(message == null) {
+                        println("Cannot find messsage in cache")
+                        loggingChannel.sendMessage("${member!!.effectiveName} deleted a message we don't have cached. Please check audit log for info.").queue()
+                    }
+                    if(member == null)
+                    {
+                        println("Failed to get deleter from AuditLog")
+                    }
+                }
+            }
+        }
     }
 
     fun messageEditedEmbed(event: MessageUpdateEvent): MessageEmbed {
@@ -292,7 +338,7 @@ class LoggerListenerAdapter : ListenerAdapter() {
         builder.setAuthor(member.effectiveName, authorAvatar, authorAvatar)
         return builder.build()
     }
-    fun permissionOverrideCreateEmbed(member: Member, role: Role, channel: ChannelUnion, allowed: EnumSet<Permission>, denied: EnumSet<Permission>, inherit: EnumSet<Permission>): MessageEmbed{
+    fun permissionOverrideCreateEmbed(member: Member, role: Role, channel: ChannelUnion, allowed: EnumSet<Permission>, denied: EnumSet<Permission>): MessageEmbed{
         val builder = EmbedBuilder()
         val authorAvatar = member.effectiveAvatarUrl
         builder.setTimestamp(Instant.now())
@@ -311,7 +357,15 @@ class LoggerListenerAdapter : ListenerAdapter() {
         builder.setAuthor(member.effectiveName, authorAvatar, authorAvatar)
         return builder.build()
     }
-    fun messageDeletedEmbed(){
-
+    //https://ptb.discord.com/channels/967140876298092634/1163106061507637278/1163127710437089291
+    fun messageDeletedEmbed(member: Member, channel: MessageChannelUnion, old_message: String): MessageEmbed{
+        val builder = EmbedBuilder()
+        val authorAvatar = member.effectiveAvatarUrl
+        builder.setTimestamp(Instant.now())
+        builder.setTitle("Deleted: <#${channel.id}>")
+        builder.setColor(MessageLevel.Level.DELETE.color)
+        builder.setDescription(old_message)
+        builder.setAuthor(member.effectiveName, authorAvatar, authorAvatar)
+        return builder.build()
     }
 }

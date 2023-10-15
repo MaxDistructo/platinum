@@ -1,9 +1,11 @@
 package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.bot.BotMain.logger
+import io.dedyn.engineermantra.omega.bot.voice.ReceivingHandler
 import io.dedyn.engineermantra.omega.shared.*
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
@@ -42,10 +44,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "audit" -> runAuditing(event)
             "poll" -> createPoll(event)
             "vote" -> createPoll(event)
-            "md" -> internalCommand(event)
             "agree" -> ruleAgreement(event)
             "level" -> checkLevel(event)
             "level2" -> checkLevel(event)
+            "record" -> recordChannel(event)
             else -> println("Command not found")
         }
     }
@@ -227,7 +229,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             }
             role.manager.setColor(Color.decode(color)).queue()
             val icon = event.getOption("icon_url")
-            //Take advantage of a library we already have as well as the bulit in java stuff
+            //Take advantage of a library we already have as well as the built-in java stuff
             //to check if the URL is to an image.
             if(icon != null)
             {
@@ -352,23 +354,47 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         {
             if(strikes.isEmpty())
             {
-                event.channel.asTextChannel().sendMessageEmbeds(
-                    DiscordUtils.simpleEmbed(
-                        event.guild!!.getMember(user)!!,
-                        "${user.asMention} has no strikes",
-                        event.guild!!
-                    )
-                ).queue()
+                if(event.channel.type == ChannelType.TEXT) {
+                    event.channel.asTextChannel().sendMessageEmbeds(
+                        DiscordUtils.simpleEmbed(
+                            event.guild!!.getMember(user)!!,
+                            "${user.asMention} has no strikes",
+                            event.guild!!
+                        )
+                    ).queue()
+                }
+                else if(event.channel.type == ChannelType.VOICE)
+                {
+                    event.channel.asVoiceChannel().sendMessageEmbeds(
+                        DiscordUtils.simpleEmbed(
+                            event.guild!!.getMember(user)!!,
+                            "${user.asMention} has no strikes",
+                            event.guild!!
+                        )
+                    ).queue()
+                }
             }
             for(strike in strikes)
             {
-                event.channel.asTextChannel().sendMessageEmbeds(
-                    DiscordUtils.simpleEmbed(
-                        event.guild!!.getMember(user)!!,
-                        strike.display(),
-                        event.guild!!
-                    )
-                ).queue()
+                if(event.channel.type == ChannelType.TEXT) {
+                    event.channel.asTextChannel().sendMessageEmbeds(
+                        DiscordUtils.simpleEmbed(
+                            event.guild!!.getMember(user)!!,
+                            strike.display(),
+                            event.guild!!
+                        )
+                    ).queue()
+                }
+                else if(event.channel.type == ChannelType.VOICE)
+                {
+                    event.channel.asVoiceChannel().sendMessageEmbeds(
+                        DiscordUtils.simpleEmbed(
+                            event.guild!!.getMember(user)!!,
+                            strike.display(),
+                            event.guild!!
+                        )
+                    ).queue()
+                }
             }
         }
         else{
@@ -442,16 +468,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             ii++
         }
     }
-    fun internalCommand(event: SlashCommandInteractionEvent)
-    {
-        val func = event.getOption("function")!!.asString
-        val args = event.getOption("args")!!.asString
-
-        if(func == "button")
-        {
-            event.reply("")
-        }
-    }
     fun ruleAgreement(event: SlashCommandInteractionEvent)
     {
         //Command is dumb and lets the individual server listeners handle the button's action
@@ -484,6 +500,22 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                     +  "Points to next level: ${expNeeded - expCurrent}",
             event.guild!!
         )).queue()
+    }
+
+    private fun recordChannel(event: SlashCommandInteractionEvent) {
+        if(!event.isFromGuild)
+        {
+            return
+        }
+        for(voicechannel in event.guild!!.voiceChannels)
+        {
+            if(voicechannel.members.contains(event.member!!))
+            {
+                val audioManager = event.guild!!.audioManager
+                audioManager.openAudioConnection(voicechannel)
+                audioManager.receivingHandler = ReceivingHandler()
+            }
+        }
     }
 }
 

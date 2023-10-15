@@ -15,12 +15,14 @@ class MessageCache{
         var content: String
         var lastEdited: Long
         var isPinned: Boolean = false
+        var author: Snowflake
 
         init{
             messageID  = message.idLong
             content = message.contentRaw
             lastEdited = Clock.systemUTC().instant().toEpochMilli()
             isPinned = message.isPinned
+            author = message.author.idLong
         }
     }
 
@@ -74,6 +76,17 @@ class MessageCache{
                 backend.remove(message.idLong)
             }
         }
+    }
+    fun get(messageId: Long): CachedMessage?
+    {
+         if(isLocked){
+             return null
+         }
+         else
+         {
+             val potential = backend[messageId] ?: return null
+             return potential
+         }
     }
     fun get(message: Message): CachedMessage?
     {

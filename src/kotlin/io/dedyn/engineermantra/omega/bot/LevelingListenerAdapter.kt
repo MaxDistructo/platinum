@@ -14,7 +14,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
     val textUserList = HashMap<Long, Long>()
     override fun onMessageReceived(event: MessageReceivedEvent) {
         //We only want to do this on guild messages, return early if it's not from a guild.
-        if(!event.isFromGuild || event.isWebhookMessage)
+        if(!event.isFromGuild || event.isWebhookMessage || event.member!!.user.isBot)
         {
             return
         }
@@ -23,11 +23,6 @@ class LevelingListenerAdapter: ListenerAdapter() {
 	    {
 		    println("Member is null. (THIS SHOULD NEVER HAPPEN)");
 	    }
-        //IGNORE BOTS
-        if(event.member!!.user.isBot)
-        {
-            return
-        }
 	    if(textUserList.containsKey(event.member!!.idLong))
         {
             val currentTime = System.currentTimeMillis()

@@ -175,12 +175,20 @@ object BotMain {
                     .addOption(OptionType.STRING, "prompt", "What do you want to ask about?", true, false)
             ).complete()
         }
-        if(!commandNames.contains("level")) {
+        if(!commandNames.contains("level") || true) {
             jda.upsertCommand(
                 Commands.slash("level", "View your level")
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                     .setGuildOnly(true)
                     .addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
+            ).complete()
+        }
+        if(!commandNames.contains("record")) {
+            jda.upsertCommand(
+                Commands.slash("record", "Record the voice chat in this channel")
+                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                    .setGuildOnly(true)
+                    //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
         jda.getGuildById(967140876298092634)!!.upsertCommand(

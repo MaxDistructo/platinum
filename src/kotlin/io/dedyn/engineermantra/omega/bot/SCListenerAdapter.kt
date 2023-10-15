@@ -30,12 +30,9 @@ class SCListenerAdapter : ListenerAdapter() {
     }
 
     override fun onGuildMemberRoleRemove(event: GuildMemberRoleRemoveEvent) {
-        if (event.guild.idLong == 967140876298092634L && event.roles.contains(
-                event.guild.getRoleById(
-                    1078829209616666705
-                )
-            )
-        ) {
+        if (event.guild.idLong == 967140876298092634L &&
+            event.roles.contains(event.guild.getRoleById(1078829209616666705)))
+        {
             ConfigMySQL.roleBanUser(event.member.idLong, event.guild.idLong, 1078829209616666705L)
         }
     }
