@@ -48,9 +48,12 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "level" -> checkLevel(event)
             "level2" -> checkLevel(event)
             "record" -> recordChannel(event)
+            "sync" -> syncRoles(event)
             else -> println("Command not found")
         }
     }
+
+
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
@@ -494,6 +497,21 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                     +  "Points to next level: ${expNeeded - expCurrent}",
             event.guild!!
         )).queue()
+    }
+
+    fun syncRoles(event: SlashCommandInteractionEvent) {
+        event.reply("Started role sync. This will take a while.").queue();
+        for(member in event.guild!!.members)
+        {
+            if(member.idLong != 1107721065947484302) {
+                DiscordUtils.addRolesInServer(
+                    member.idLong,
+                    event.guild!!.idLong,
+                    BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(member.idLong)!!.roles
+                )
+            }
+        }
+
     }
 
     private fun recordChannel(event: SlashCommandInteractionEvent) {

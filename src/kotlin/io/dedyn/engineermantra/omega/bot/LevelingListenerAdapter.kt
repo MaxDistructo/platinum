@@ -88,6 +88,10 @@ class LevelingListenerAdapter: ListenerAdapter() {
 
     //Triggers when a user joins/leaves VC
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
+        if(event.guild.idLong != 967140876298092634)
+        {
+            return;
+        }
         //Moved between VCs
         if(event.channelJoined != null && event.channelLeft != null)
         {

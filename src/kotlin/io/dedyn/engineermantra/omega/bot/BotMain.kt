@@ -196,6 +196,11 @@ object BotMain {
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                 .setGuildOnly(true)
         ).complete()
+        jda.getGuildById(1165357291629989979)!!.upsertCommand(
+            Commands.slash("sync", "Sync roles from Salem Central")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .setGuildOnly(true)
+        ).complete()
         /*
         if(!commandNames.contains("md"))
         {

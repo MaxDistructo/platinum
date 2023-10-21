@@ -145,4 +145,49 @@ object DiscordUtils {
         }
         return false
     }
+
+    fun addRolesInServer(userId: Long, serverId: Long, roles: List<Role>)
+    {
+        val guild = BotMain.jda.getGuildById(serverId)!!
+        val user = guild.getMemberById(userId)
+        for(role in roles)
+        {
+            if(user != null)
+            {
+                guild.addRoleToMember(user,getOrCreateRole(serverId, role)).queue()
+            }
+        }
+    }
+
+    fun removeRolesInServer(userId: Long, serverId: Long, roles: List<Role>)
+    {
+        val guild = BotMain.jda.getGuildById(serverId)!!
+        val user = guild.getMemberById(userId)
+        for(role in roles)
+        {
+            if(user != null)
+            {
+                guild.removeRoleFromMember(user,getOrCreateRole(serverId, role))
+            }
+        }
+    }
+
+    fun getOrCreateRole(serverId: Long, role: Role): Role
+    {
+        val guild = BotMain.jda.getGuildById(serverId)!!
+        val potentialRoles = guild.getRolesByName(role.name, false)
+        if (potentialRoles.size > 0)
+        {
+            return potentialRoles[0]
+        }
+        else{
+            val roleAction = guild.createRole()
+            roleAction.setName(role.name)
+            roleAction.setColor(role.color)
+            roleAction.setPermissions(role.permissions)
+            roleAction.setHoisted(role.isHoisted)
+            roleAction.setMentionable(role.isMentionable)
+            return roleAction.complete()
+        }
+    }
 }

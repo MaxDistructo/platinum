@@ -1,5 +1,7 @@
 package io.dedyn.engineermantra.omega.bot
 
+import io.dedyn.engineermantra.omega.bot.DiscordUtils.addRolesInServer
+import io.dedyn.engineermantra.omega.bot.DiscordUtils.removeRolesInServer
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.MessageLevel
 import io.dedyn.engineermantra.omega.shared.Timer
@@ -8,6 +10,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
@@ -34,6 +37,10 @@ class SCListenerAdapter : ListenerAdapter() {
             event.roles.contains(event.guild.getRoleById(1078829209616666705)))
         {
             ConfigMySQL.roleBanUser(event.member.idLong, event.guild.idLong, 1078829209616666705L)
+        }
+        if(event.guild.idLong == 967140876298092634L)
+        {
+            removeRolesInServer(event.member.idLong, 1165357291629989979L, event.roles)
         }
     }
 
@@ -145,6 +152,17 @@ class SCListenerAdapter : ListenerAdapter() {
         if(event.roles[0].idLong == 1129010319432364042)
         {
             BotMain.timerThread.registerTimer(Timer({event.guild.removeRoleFromMember(event.member, event.roles[0])}, 24*60*60))
+        }
+        if(event.guild.idLong == 967140876298092634L)
+        {
+            addRolesInServer(event.member.idLong, 1165357291629989979L, event.roles)
+        }
+    }
+
+    override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
+        if(event.guild.idLong == 1165357291629989979L)
+        {
+            addRolesInServer(event.member.idLong, event.guild.idLong, BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(event.member.idLong)!!.roles)
         }
     }
 
