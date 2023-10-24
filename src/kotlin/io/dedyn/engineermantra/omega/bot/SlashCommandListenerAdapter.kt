@@ -9,6 +9,7 @@ import io.dedyn.engineermantra.omega.shared.Utils
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
@@ -53,11 +54,11 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "sync" -> syncRoles(event)
             "goodmorning" -> moveToDay(event)
             "goodnight" -> moveToNight(event)
+            "summon" -> summonToVC(event)
+            "goto" -> gotoMember(event)
             else -> println("Command not found")
         }
     }
-
-
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
@@ -543,6 +544,45 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         for(cottage in cottages){
             for(member in cottage.members){
                 event.guild!!.moveVoiceMember(member, dayChannel).queue()
+            }
+        }
+    }
+
+    fun summonToVC(event: SlashCommandInteractionEvent)
+    {
+        event.reply("Summoning").queue()
+        var author_vc: VoiceChannel? = null;
+        val membersToMove = mutableListOf<Member>()
+        for(vc in event.guild!!.voiceChannels) {
+            if (vc.members.contains(event.member))
+            {
+                author_vc = vc
+            }
+            else{
+                if(author_vc != null)
+                {
+                    for(member in vc.members) {
+                        event.guild!!.moveVoiceMember(member, author_vc).queue()
+                    }
+                }
+                else{
+                    membersToMove.addAll(vc.members)
+                }
+            }
+        }
+        for(member in membersToMove)
+        {
+            event.guild!!.moveVoiceMember(member, author_vc).queue()
+        }
+    }
+    fun gotoMember(event: SlashCommandInteractionEvent)
+    {
+        for(vc in event.guild!!.voiceChannels)
+        {
+            if(vc.members.contains(event.getOption("user")!!.asMember))
+            {
+                event.guild!!.moveVoiceMember(event.member!!, vc)
+                return
             }
         }
     }

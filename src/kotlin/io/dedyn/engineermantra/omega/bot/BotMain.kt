@@ -211,6 +211,17 @@ object BotMain {
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                 .setGuildOnly(true)
         ).complete()
+        jda.getGuildById(1165357291629989979)!!.upsertCommand(
+            Commands.slash("summon", "Summon all VC members")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .setGuildOnly(true)
+        ).complete()
+        jda.getGuildById(1165357291629989979)!!.upsertCommand(
+            Commands.slash("goto", "Goto Person in VC")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .setGuildOnly(true)
+                .addOption(OptionType.USER, "user", "The user to go to")
+        ).complete()
         /*
         if(!commandNames.contains("md"))
         {
