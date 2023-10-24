@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.events.guild.GuildBanEvent
+import net.dv8tion.jda.api.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
@@ -20,6 +22,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.sourceforge.tess4j.Tesseract
 import java.io.File
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class SCListenerAdapter : ListenerAdapter() {
     override fun onGuildMemberRemove(event: GuildMemberRemoveEvent) {
@@ -29,6 +32,21 @@ class SCListenerAdapter : ListenerAdapter() {
                 ConfigMySQL.removeBooster(booster)
                 break
             }
+        }
+
+    }
+
+    override fun onGuildBan(event: GuildBanEvent) {
+        if(event.guild.idLong == 967140876298092634L)
+        {
+            event.jda.getGuildById(1165357291629989979L)!!.ban(event.user, 0, TimeUnit.SECONDS).queue()
+        }
+    }
+
+    override fun onGuildUnban(event: GuildUnbanEvent) {
+        if(event.guild.idLong == 967140876298092634L)
+        {
+            event.jda.getGuildById(1165357291629989979L)!!.unban(event.user).queue()
         }
     }
 
@@ -162,7 +180,15 @@ class SCListenerAdapter : ListenerAdapter() {
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         if(event.guild.idLong == 1165357291629989979L)
         {
-            addRolesInServer(event.member.idLong, event.guild.idLong, BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(event.member.idLong)!!.roles)
+            val potentialMember = BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(event.member.idLong)
+            if(potentialMember == null && !event.member.user.isBot){
+                //YEET!
+                event.guild.systemChannel!!.sendMessage("Hello UserBot. You are not welcome here. YEET! \n https://tenor.com/view/yeet-gif-19591438").queue()
+                event.member.kick().reason("Likely a bot account as they are not in Salem Central").queue()
+            }
+            else {
+                addRolesInServer(event.member.idLong, event.guild.idLong, BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(event.member.idLong)!!.roles)
+            }
         }
     }
 

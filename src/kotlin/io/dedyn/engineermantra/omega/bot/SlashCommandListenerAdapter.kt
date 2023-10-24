@@ -2,14 +2,15 @@ package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.bot.BotMain.logger
 import io.dedyn.engineermantra.omega.bot.voice.ReceivingHandler
-import io.dedyn.engineermantra.omega.shared.*
+import io.dedyn.engineermantra.omega.shared.ConfigFileJson
+import io.dedyn.engineermantra.omega.shared.ConfigMySQL
+import io.dedyn.engineermantra.omega.shared.DatabaseObject
+import io.dedyn.engineermantra.omega.shared.Utils
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.emoji.Emoji
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -23,6 +24,7 @@ import java.io.IOException
 import java.net.URI
 import java.sql.Timestamp
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.math.pow
 
@@ -49,6 +51,8 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "level2" -> checkLevel(event)
             "record" -> recordChannel(event)
             "sync" -> syncRoles(event)
+            "goodmorning" -> moveToDay(event)
+            "goodnight" -> moveToNight(event)
             else -> println("Command not found")
         }
     }
@@ -500,7 +504,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     }
 
     fun syncRoles(event: SlashCommandInteractionEvent) {
-        event.reply("Started role sync. This will take a while.").queue();
+        event.reply("Started sync. This will take a while.").queue();
         for(member in event.guild!!.members)
         {
             if(member.idLong != 1107721065947484302) {
@@ -511,7 +515,36 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 )
             }
         }
+        for(member in event.jda.getGuildById(967140876298092634)!!.retrieveBanList())
+        {
+            event.guild!!.ban(member.user,0, TimeUnit.SECONDS).reason(member.reason).queue()
+        }
+    }
 
+    fun moveToNight(event: SlashCommandInteractionEvent){
+        event.reply("GO TO SLEEP!").queue()
+        val vc_members = event.guild!!.getVoiceChannelById(1165358627209617588L)!!.members
+        val cottages = event.guild!!.getVoiceChannelsByName("\uD83D\uDECC Cottage", false)
+        var cottageNum = 0
+        for (i in vc_members.indices)
+        {
+            if(!vc_members[i].user.isBot) {
+                println("moving ${vc_members[i].effectiveName}")
+                event.guild!!.moveVoiceMember(vc_members[i], cottages[cottageNum]).queue()
+                cottageNum++
+            }
+        }
+    }
+    fun moveToDay(event: SlashCommandInteractionEvent)
+    {
+        event.reply("Wake Up!").queue()
+        val cottages = event.guild!!.getVoiceChannelsByName("\uD83D\uDECC Cottage", false)
+        val dayChannel = event.guild!!.getVoiceChannelById(1165358627209617588L)
+        for(cottage in cottages){
+            for(member in cottage.members){
+                event.guild!!.moveVoiceMember(member, dayChannel).queue()
+            }
+        }
     }
 
     private fun recordChannel(event: SlashCommandInteractionEvent) {

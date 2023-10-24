@@ -201,6 +201,16 @@ object BotMain {
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                 .setGuildOnly(true)
         ).complete()
+        jda.getGuildById(1165357291629989979)!!.upsertCommand(
+            Commands.slash("goodnight", "Sends members to SLEEP")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .setGuildOnly(true)
+        ).complete()
+        jda.getGuildById(1165357291629989979)!!.upsertCommand(
+            Commands.slash("goodmorning", "Wakes everyone up")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .setGuildOnly(true)
+        ).complete()
         /*
         if(!commandNames.contains("md"))
         {
