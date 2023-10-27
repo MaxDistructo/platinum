@@ -44,7 +44,8 @@ object Main {
         //Now that we have a long-running process, run the WebMain
         websiteScope.launch{
             BotMain.logger.info("Starting up website")
-            WebMain.run();
+            val webMain = WebMain()
+            webMain.main(arrayOf())
         }
         //And follow with the bot main.
         botScope.launch {
