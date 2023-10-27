@@ -14,6 +14,10 @@ plugins {
     //id("com.github.johnrengelman.shadow") version "7.1.2"
     //id "com.github.ben-manes.versions" version "0.20.0"
     //id 'com.sedmelluq.jdaction' version '1.0.2'
+    id("org.springframework.boot") version "3.1.5"
+    id("io.spring.dependency-management") version "1.1.3"
+    kotlin("plugin.spring") version "1.9.10"
+    kotlin("plugin.jpa") version "1.9.10"
 }
 group = "io.dedyn.engineermantra"
 
@@ -43,6 +47,13 @@ dependencies {
     implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.8.0")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-core", version = "5prealpha-SNAPSHOT")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-data", version = "5prealpha-SNAPSHOT")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-mustache")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.springframework.boot:spring-boot-devtools")
 //implementation(kotlin("stdlib-jdk8"))
 }
 
@@ -60,6 +71,7 @@ sourceSets["main"].withConvention(conventionType = org.jetbrains.kotlin.gradle.p
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlinOptions.freeCompilerArgs += "-Xjsr305=strict"
 }
 
 tasks {
