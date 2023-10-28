@@ -594,23 +594,25 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             return
         }
         val storytellerRole = event.guild!!.getRoleById(1165387353787990147L)!!
-        if(event.member!!.hasPermission(Permission.MANAGE_ROLES))
+        val frequentStoryteller = event.guild!!.getRoleById(1167701898212683786L)!!
+        if((event.member!!.hasPermission(Permission.MANAGE_ROLES) || event.member!!.roles.contains(frequentStoryteller)) && (!(event.member!!.roles.contains(storytellerRole)) || event.getOption("force")?.asBoolean == true))
         {
             for (member in event.guild!!.getMembersWithRoles(storytellerRole)) {
                 if (member.idLong != event.member!!.idLong) {
                     event.guild!!.removeRoleFromMember(member, storytellerRole).queue()
                 }
             }
-
-            if(event.getOption("user")!!.asMember == null) {
+            if(event.getOption("user") == null) {
                 event.reply("You have taken control as the primary storyteller").queue()
                 event.guild!!.addRoleToMember(event.member!!, storytellerRole).queue()
                 BotMain.managerStoryteller = event.member!!.idLong
+                event.guild!!.modifyNickname(event.member!!, "[GM] ${event.member!!.effectiveName}").queue()
             }
             else{
                 event.reply("You have made ${event.getOption("user")!!.asMember!!.effectiveName} the primary storyteller").queue()
                 event.guild!!.addRoleToMember(event.getOption("user")!!.asMember!!, storytellerRole).queue()
                 BotMain.managerStoryteller = event.getOption("user")!!.asMember!!.idLong
+                event.guild!!.modifyNickname(event.getOption("user")!!.asMember!!, "[GM] ${event.getOption("user")!!.asMember!!.effectiveName}").queue()
             }
         }
         else if(event.member!!.roles.contains(storytellerRole) && event.member!!.idLong == BotMain.managerStoryteller)
@@ -621,11 +623,23 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 if(mentionedUser.roles.contains(storytellerRole)){
                     BotMain.managerStoryteller = mentionedUser.idLong
                     event.reply("You have made ${mentionedUser.effectiveName} the primary storyteller").queue()
+                    event.guild!!.modifyNickname(mentionedUser, "[GM] ${mentionedUser.effectiveName}").queue()
+                    for(member in event.guild!!.getMembersWithRoles(storytellerRole))
+                    {
+                        if(member.idLong != mentionedUser.idLong)
+                        {
+                            event.guild!!.removeRoleFromMember(member, storytellerRole).queue()
+                        }
+                    }
                 }
                 else {
                     event.guild!!.addRoleToMember(mentionedUser, storytellerRole).queue()
+                    event.guild!!.modifyNickname(mentionedUser, "[Helper] ${event.getOption("user")!!.asMember!!.effectiveName}").queue()
                     event.reply("You have added ${mentionedUser.effectiveName} as a co-host").queue()
                 }
+            }
+            else{
+                event.reply("You must specify someone to use this command on").queue()
             }
         }
     }

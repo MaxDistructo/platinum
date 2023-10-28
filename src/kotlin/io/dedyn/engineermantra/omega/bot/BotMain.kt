@@ -228,6 +228,7 @@ object BotMain {
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                 .setGuildOnly(true)
                 .addOption(OptionType.USER, "user", "The user to go to", false)
+                .addOption(OptionType.BOOLEAN, "force", "Force yourself to become primary", false)
         ).complete()
         /*
         if(!commandNames.contains("md"))
