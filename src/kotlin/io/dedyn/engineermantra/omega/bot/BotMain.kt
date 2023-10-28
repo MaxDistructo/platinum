@@ -19,6 +19,7 @@ object BotMain {
     val voiceCache = mutableMapOf<Long, Long>()
     val auditThread = AuditThread()
     val timerThread = TimerThread()
+    var managerStoryteller: Long = 0L
 
     fun run()
     {
@@ -221,6 +222,12 @@ object BotMain {
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                 .setGuildOnly(true)
                 .addOption(OptionType.USER, "user", "The user to go to")
+        ).complete()
+        jda.getGuildById(1165357291629989979)!!.upsertCommand(
+            Commands.slash("promote", "Promote a user to Storyteller")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .setGuildOnly(true)
+                .addOption(OptionType.USER, "user", "The user to go to", false)
         ).complete()
         /*
         if(!commandNames.contains("md"))

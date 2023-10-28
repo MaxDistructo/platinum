@@ -56,6 +56,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "goodnight" -> moveToNight(event)
             "summon" -> summonToVC(event)
             "goto" -> gotoMember(event)
+            "promote" -> promoteMember(event)
             else -> println("Command not found")
         }
     }
@@ -583,6 +584,48 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             {
                 event.guild!!.moveVoiceMember(event.member!!, vc)
                 return
+            }
+        }
+    }
+
+    fun promoteMember(event: SlashCommandInteractionEvent) {
+        if(event.guild == null)
+        {
+            return
+        }
+        val storytellerRole = event.guild!!.getRoleById(1165387353787990147L)!!
+        if(event.member!!.hasPermission(Permission.MANAGE_ROLES))
+        {
+            for (member in event.guild!!.getMembersWithRoles(storytellerRole)) {
+                if (member.idLong != event.member!!.idLong) {
+                    event.guild!!.removeRoleFromMember(member, storytellerRole).queue()
+                }
+            }
+
+            if(event.getOption("user")!!.asMember == null) {
+                event.reply("You have taken control as the primary storyteller").queue()
+                event.guild!!.addRoleToMember(event.member!!, storytellerRole).queue()
+                BotMain.managerStoryteller = event.member!!.idLong
+            }
+            else{
+                event.reply("You have made ${event.getOption("user")!!.asMember!!.effectiveName} the primary storyteller").queue()
+                event.guild!!.addRoleToMember(event.getOption("user")!!.asMember!!, storytellerRole).queue()
+                BotMain.managerStoryteller = event.getOption("user")!!.asMember!!.idLong
+            }
+        }
+        else if(event.member!!.roles.contains(storytellerRole) && event.member!!.idLong == BotMain.managerStoryteller)
+        {
+            val mentionedUser = event.getOption("user")!!.asMember
+            if(mentionedUser != null)
+            {
+                if(mentionedUser.roles.contains(storytellerRole)){
+                    BotMain.managerStoryteller = mentionedUser.idLong
+                    event.reply("You have made ${mentionedUser.effectiveName} the primary storyteller").queue()
+                }
+                else {
+                    event.guild!!.addRoleToMember(mentionedUser, storytellerRole).queue()
+                    event.reply("You have added ${mentionedUser.effectiveName} as a co-host").queue()
+                }
             }
         }
     }
