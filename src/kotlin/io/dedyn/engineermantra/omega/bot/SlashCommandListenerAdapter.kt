@@ -690,6 +690,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                         break
                     }
                 }
+                if(!immune)
+                {
+                    num_to_kick++
+                }
                 if(!immune && !trialrun){
                     member.user.openPrivateChannel().complete().sendMessage("You have been kicked from Salem Central for inactivity.\n If you wish to rejoin, here is the invite link.\n https://discord.gg/salemcentral").complete()
                     member.kick().queue()
@@ -698,7 +702,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 {
                     writer.write("${member.user.name},${member.effectiveName}\n")
                 }
-                num_to_kick++
             }
         }
         writer.close()
