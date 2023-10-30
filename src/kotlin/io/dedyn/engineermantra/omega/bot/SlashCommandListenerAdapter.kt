@@ -57,9 +57,12 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "summon" -> summonToVC(event)
             "goto" -> gotoMember(event)
             "promote" -> promoteMember(event)
+            "purge" -> thePurge(event)
             else -> println("Command not found")
         }
     }
+
+
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
@@ -642,6 +645,61 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 event.reply("You must specify someone to use this command on").queue()
             }
         }
+    }
+
+    fun thePurge(event: SlashCommandInteractionEvent) {
+        if(event.guild!!.idLong != 967140876298092634L)
+        {
+            return
+        }
+        val trialrun = event.getOption("trial")?.asBoolean ?: true
+        var num_to_kick = 0
+        event.reply("The Purge has Started.").queue()
+        //Non-Purged roles
+        val staff = event.guild!!.getRoleById(967936604285059112)
+        val trusted = event.guild!!.getRoleById(1064700085696466996L)
+        val bmg = event.guild!!.getRoleById(967146833363234987L)
+        val bots = event.guild!!.getRoleById(967148457380941844L)
+        val booster = event.guild!!.getRoleById(967773705906294874L)
+        val tosalpha = event.guild!!.getRoleById(1099054240409858229L)
+        val formerstaff = event.guild!!.getRoleById(1042129275991638108L)
+        val staffalts = event.guild!!.getRoleById(1102367201530499082L)
+        val noob = event.guild!!.getRoleById(969724951944896522L)
+        val bot = event.guild!!.getRoleById(970761273082015864L)
+        val invis = event.guild!!.getRoleById(1073738343105437796L)
+        val william = event.guild!!.getRoleById(967561913443688460L)
+        val eventping = event.guild!!.getRoleById(970108033009057822L)
+        val eventhost = event.guild!!.getRoleById(971038281649238046L)
+        val exceptionRoles = listOf(staff, trusted, bmg, bots, booster, tosalpha, formerstaff, staffalts, noob, bot, invis, william, eventping, eventhost)
+        for(member in event.guild!!.members){
+            val points = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong)
+            //Potential kick 1: No leveling points
+            if(points.levelingPoints == 0)
+            {
+                var immune = false
+                for(role in exceptionRoles)
+                {
+                    if(member.roles.contains(role))
+                    {
+                        immune = true
+                        //break the loop
+                        break
+                    }
+                }
+                if(!immune && !trialrun){
+                    member.user.openPrivateChannel().complete().sendMessage("You have been kicked from Salem Central for inactivity.\n If you wish to rejoin, here is the invite link.\n https://discord.gg/salemcentral").complete()
+                    member.kick().queue()
+                }
+                num_to_kick++
+            }
+        }
+        if(trialrun) {
+            event.channel.sendMessage("We would kick $num_to_kick members").queue()
+        }
+        else{
+            event.channel.sendMessage("Kicking $num_to_kick members").queue()
+        }
+
     }
 
     private fun recordChannel(event: SlashCommandInteractionEvent) {
