@@ -176,7 +176,7 @@ object BotMain {
                     .addOption(OptionType.STRING, "prompt", "What do you want to ask about?", true, false)
             ).complete()
         }
-        if(!commandNames.contains("level") || true) {
+        if(!commandNames.contains("level")) {
             jda.upsertCommand(
                 Commands.slash("level", "View your level")
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
@@ -195,6 +195,12 @@ object BotMain {
         jda.getGuildById(967140876298092634)!!.upsertCommand(
             Commands.slash("agree", "Agree to the terms and conditions in this channel")
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+                .setGuildOnly(true)
+        ).complete()
+        jda.getGuildById(967140876298092634)!!.upsertCommand(
+            Commands.slash("purge", "DA PURGE")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .addOption(OptionType.BOOLEAN, "trial", "Do a trial run?")
                 .setGuildOnly(true)
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(

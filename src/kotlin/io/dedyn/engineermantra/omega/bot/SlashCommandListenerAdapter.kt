@@ -671,6 +671,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         val eventping = event.guild!!.getRoleById(970108033009057822L)
         val eventhost = event.guild!!.getRoleById(971038281649238046L)
         val exceptionRoles = listOf(staff, trusted, bmg, bots, booster, tosalpha, formerstaff, staffalts, noob, bot, invis, william, eventping, eventhost)
+        val outfile = File(Utils.getRunningDir() + "/purge.csv");
+        outfile.createNewFile();
+        val writer = outfile.writer()
+        writer.write("username,displayname\n")
         for(member in event.guild!!.members){
             val points = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong)
             //Potential kick 1: No leveling points
@@ -690,9 +694,14 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                     member.user.openPrivateChannel().complete().sendMessage("You have been kicked from Salem Central for inactivity.\n If you wish to rejoin, here is the invite link.\n https://discord.gg/salemcentral").complete()
                     member.kick().queue()
                 }
+                if(trialrun && !immune)
+                {
+                    writer.write("${member.user.name},${member.effectiveName}\n")
+                }
                 num_to_kick++
             }
         }
+        writer.close()
         if(trialrun) {
             event.channel.sendMessage("We would kick $num_to_kick members").queue()
         }
