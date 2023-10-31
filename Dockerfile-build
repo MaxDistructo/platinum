@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.8_7-jdk-jammy
+FROM eclipse-temurin:17.0.9_9-jdk-jammy
 WORKDIR /opt/platinum
 RUN echo "1.1" > version
 RUN apt update
