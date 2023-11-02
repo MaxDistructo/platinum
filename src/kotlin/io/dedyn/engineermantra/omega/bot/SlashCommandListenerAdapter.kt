@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
 import net.dv8tion.jda.api.interactions.components.buttons.Button
+import org.apache.pdfbox.cos.COSName.V
+import org.checkerframework.checker.units.qual.K
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -26,8 +28,10 @@ import java.net.URI
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
 import javax.imageio.ImageIO
 import kotlin.math.pow
+
 
 class SlashCommandListenerAdapter: ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
@@ -58,11 +62,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "goto" -> gotoMember(event)
             "promote" -> promoteMember(event)
             "purge" -> thePurge(event)
+            "top" -> levelTop(event)
             else -> println("Command not found")
         }
     }
-
-
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
@@ -712,6 +715,23 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             event.channel.sendMessage("Kicking $num_to_kick members").queue()
         }
 
+    }
+
+    fun levelTop(event: SlashCommandInteractionEvent) {
+        event.reply("Searching").queue()
+        val map = mutableMapOf<Long, Int>()
+        for(member in event.guild!!.members)
+        {
+            map[member.idLong] = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong).levelingPoints
+        }
+        val sorted = sortedMapOf(*map.asSequence().take(10).map{it.key to it.value}.toList().toTypedArray())
+        val str_builder = StringBuilder()
+        var i = 1
+        for(value in sorted){
+            str_builder.append("$i. ${event.guild!!.getMemberById(value.key)!!.asMention}: ${value.value}\n")
+            i++
+        }
+        event.channel.sendMessageEmbeds(DiscordUtils.simpleEmbed(event.member!!, str_builder.toString(), event.guild!!)).queue()
     }
 
     private fun recordChannel(event: SlashCommandInteractionEvent) {

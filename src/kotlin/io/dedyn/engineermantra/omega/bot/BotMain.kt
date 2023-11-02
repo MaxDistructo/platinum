@@ -192,6 +192,14 @@ object BotMain {
                     //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
+        if(!commandNames.contains("top"))
+        {
+            jda.upsertCommand(
+                Commands.slash("top", "Display the top 10 people by level in the server")
+                    .setGuildOnly(true)
+                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+            ).complete()
+        }
         jda.getGuildById(967140876298092634)!!.upsertCommand(
             Commands.slash("agree", "Agree to the terms and conditions in this channel")
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
