@@ -77,6 +77,10 @@ class SCListenerAdapter : ListenerAdapter() {
     }
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
+        if(!event.isFromGuild)
+        {
+            return
+        }
         //println(event.message.contentRaw)
         if (event.guild.idLong == 967140876298092634L) {
             //println("Recieved Message")

@@ -18,8 +18,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
 import net.dv8tion.jda.api.interactions.components.buttons.Button
-import org.apache.pdfbox.cos.COSName.V
-import org.checkerframework.checker.units.qual.K
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -698,8 +696,13 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                     num_to_kick++
                 }
                 if(!immune && !trialrun){
-                    member.user.openPrivateChannel().complete().sendMessage("You have been kicked from Salem Central for inactivity.\n If you wish to rejoin, here is the invite link.\n https://discord.gg/salemcentral").complete()
-                    member.kick().queue()
+                    try {
+                        member.user.openPrivateChannel().complete()
+                            .sendMessage("You have been kicked from Salem Central for inactivity.\n If you wish to rejoin, here is the invite link.\n https://discord.gg/salemcentral")
+                            .complete()
+                        member.kick().queue()
+                    }
+                    catch(e: net.dv8tion.jda.api.exceptions.ErrorResponseException){}
                 }
                 if(trialrun && !immune)
                 {
