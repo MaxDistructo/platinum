@@ -192,23 +192,18 @@ object BotMain {
                     //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
-        if(!commandNames.contains("top"))
+        if(!commandNames.contains("top") || true)
         {
             jda.upsertCommand(
                 Commands.slash("top", "Display the top 10 people by level in the server")
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+                    .addOption(OptionType.INTEGER, "page", "Page number to display?")
             ).complete()
         }
         jda.getGuildById(967140876298092634)!!.upsertCommand(
             Commands.slash("agree", "Agree to the terms and conditions in this channel")
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                .setGuildOnly(true)
-        ).complete()
-        jda.getGuildById(967140876298092634)!!.upsertCommand(
-            Commands.slash("purge", "DA PURGE")
-                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .addOption(OptionType.BOOLEAN, "trial", "Do a trial run?")
                 .setGuildOnly(true)
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(

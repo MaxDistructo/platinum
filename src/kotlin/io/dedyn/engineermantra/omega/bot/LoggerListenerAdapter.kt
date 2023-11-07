@@ -226,53 +226,6 @@ class LoggerListenerAdapter : ListenerAdapter() {
         }
     }
 
-    override fun onMessageDelete(event: MessageDeleteEvent)
-    {
-        ioScope.launch {
-            var member: Member? = null;
-            event.guild.retrieveAuditLogs()
-                .type(ActionType.MESSAGE_DELETE)
-                .limit(1)
-                .queue { list -> member = event.guild.getMember(list[0].user!!)}
-            if(event.guild.idLong == 967140876298092634L)
-            {
-                println("Guild Verified")
-                val loggingChannel = BotMain.jda.getTextChannelById(967156927731748914L) as MessageChannelUnion
-                val message = messageCache.get(event.messageIdLong)
-
-                //Wait for the audit log response upto 1min.
-                val startWait = Instant.now().epochSecond
-                var waitTime = 0L
-                while(member == null && waitTime < 1000*60)
-                {
-                    waitTime = Instant.now().epochSecond - startWait
-                    Thread.sleep(10)
-                }
-
-                if(message != null && member != null)
-                {
-                    println("Member: ${member!!.effectiveName}, Channel: ${event.channel.name}, Content: ${message.content}")
-                    loggingChannel.sendMessageEmbeds(messageDeletedEmbed(member!!, event.channel, message.content)).queue()
-                }
-                else if(member == null && message != null)
-                {
-                    println("assuming self deleted message")
-                    loggingChannel.sendMessageEmbeds(messageDeletedEmbed(event.guild.getMemberById(message.author)!!, event.channel, message.content)).queue()
-                }
-                else{
-                    if(message == null) {
-                        println("Cannot find messsage in cache")
-                        loggingChannel.sendMessage("${member!!.effectiveName} deleted a message we don't have cached. Please check audit log for info.").queue()
-                    }
-                    if(member == null)
-                    {
-                        println("Failed to get deleter from AuditLog")
-                    }
-                }
-            }
-        }
-    }
-
     fun messageEditedEmbed(event: MessageUpdateEvent): MessageEmbed {
         val builder = EmbedBuilder()
 

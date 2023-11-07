@@ -18,10 +18,7 @@ object ConfigMySQL: ConfigFileInterface {
         db_name = ConfigFileJson.get("sql_database") ?: "omega"
         username = ConfigFileJson.get("sql_username") ?: "omega"
         password = ConfigFileJson.get("sql_password") ?: "REDACTED"
-        if(BotMain.jda.selfUser.idLong != 1107721065947484302L)
-        {
-            load()
-        }
+        load()
     }
 
     override fun load() {
@@ -44,11 +41,13 @@ object ConfigMySQL: ConfigFileInterface {
     }
     private fun assertIsConnected(): Boolean
     {
+        /*
         if(BotMain.jda.selfUser.idLong == 1107721065947484302L)
         {
             BotMain.logger.warn("BOT IS RUNNING IN DEBUG MODE. ALL SQL REQUESTS WILL FAIL AND RETURN NULL.")
             return false
         }
+         */
         if(connection.isClosed)
         {
             load()

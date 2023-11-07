@@ -6,6 +6,7 @@ import io.dedyn.engineermantra.omega.shared.ConfigFileJson
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.DatabaseObject
 import io.dedyn.engineermantra.omega.shared.Utils
+import io.dedyn.engineermantra.omega.shared.Utils.calculateLevel
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -59,7 +60,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "summon" -> summonToVC(event)
             "goto" -> gotoMember(event)
             "promote" -> promoteMember(event)
-            "purge" -> thePurge(event)
+            //"purge" -> thePurge(event)
             "top" -> levelTop(event)
             else -> println("Command not found")
         }
@@ -721,20 +722,35 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     }
 
     fun levelTop(event: SlashCommandInteractionEvent) {
-        event.reply("Searching").queue()
+        val pageNum = event.getOption("page")?.asInt ?: 1
+        if(pageNum < 0 || pageNum > (event.guild!!.members.size / 10))
+        {
+            event.reply("Invalid number specified").queue()
+        }
         val map = mutableMapOf<Long, Int>()
         for(member in event.guild!!.members)
         {
-            map[member.idLong] = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong).levelingPoints
+            val levelingPoints = ConfigMySQL.getLevelingPointsOrDefault(member.idLong, member.guild.idLong).levelingPoints
+            if(levelingPoints > 0) {
+                map[member.idLong] = levelingPoints
+            }
         }
-        val sorted = sortedMapOf(*map.asSequence().take(10).map{it.key to it.value}.toList().toTypedArray())
+        val sorted = map.toList().sortedBy{ (_, value) -> value}.reversed()
         val str_builder = StringBuilder()
         var i = 1
-        for(value in sorted){
-            str_builder.append("$i. ${event.guild!!.getMemberById(value.key)!!.asMention}: ${value.value}\n")
-            i++
+        var j = 0
+        if(pageNum > 1)
+        {
+             i = (pageNum - 1) * 10 + 1
+             j = (pageNum - 1) * 10
         }
-        event.channel.sendMessageEmbeds(DiscordUtils.simpleEmbed(event.member!!, str_builder.toString(), event.guild!!)).queue()
+        while(j < pageNum * 10){
+            str_builder.append("$i. ${event.guild!!.getMemberById(sorted[j].first)!!.asMention} - ${sorted[j].second} (Level ${calculateLevel(sorted[j].second)})\n")
+            i++
+            j++
+        }
+        str_builder.append("Page ${pageNum}/${sorted.size / 10}")
+        event.replyEmbeds(DiscordUtils.simpleEmbed(event.member!!, str_builder.toString(), event.guild!!)).queue()
     }
 
     private fun recordChannel(event: SlashCommandInteractionEvent) {
