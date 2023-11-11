@@ -181,21 +181,6 @@ class SCListenerAdapter : ListenerAdapter() {
         }
     }
 
-    override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
-        if(event.guild.idLong == 1165357291629989979L)
-        {
-            val potentialMember = BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(event.member.idLong)
-            if(potentialMember == null && !event.member.user.isBot){
-                //YEET!
-                event.guild.systemChannel!!.sendMessage("Hello UserBot. You are not welcome here. YEET! \n https://tenor.com/view/yeet-gif-19591438").queue()
-                event.member.kick().reason("Likely a bot account as they are not in Salem Central").queue()
-            }
-            else {
-                addRolesInServer(event.member.idLong, event.guild.idLong, BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(event.member.idLong)!!.roles)
-            }
-        }
-    }
-
     fun staffRoleLog(event: GuildMemberRoleAddEvent){
         val adminRole = event.guild.getRoleById(967142423534903358)
         val moderatorRole = event.guild.getRoleById(967142088296767598)
