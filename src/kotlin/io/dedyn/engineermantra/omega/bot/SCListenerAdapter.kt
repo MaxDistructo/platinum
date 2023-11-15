@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -80,6 +81,10 @@ class SCListenerAdapter : ListenerAdapter() {
         if(!event.isFromGuild)
         {
             return
+        }
+        if(event.author.idLong == 1083884798189252690L)
+        {
+            event.message.delete().reason("Monke").queue();
         }
         //println(event.message.contentRaw)
         if (event.guild.idLong == 967140876298092634L) {
