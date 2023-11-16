@@ -12,7 +12,7 @@ object ConfigMySQL: ConfigFileInterface {
     val username: String
     val password: String
 
-    init{
+    init {
         server_ip = ConfigFileJson.get("sql_server_ip") ?: "localhost"
         server_port = ConfigFileJson.get("sql_server_port") ?: "3306"
         db_name = ConfigFileJson.get("sql_database") ?: "omega"
@@ -22,7 +22,8 @@ object ConfigMySQL: ConfigFileInterface {
     }
 
     override fun load() {
-        connection = DriverManager.getConnection("jdbc:mariadb://$server_ip:$server_port/$db_name?user=$username&password=$password")
+        connection =
+            DriverManager.getConnection("jdbc:mariadb://$server_ip:$server_port/$db_name?user=$username&password=$password")
     }
 
     override fun save() {
@@ -39,8 +40,8 @@ object ConfigMySQL: ConfigFileInterface {
         //TODO: Come back to this, it's going to take a bunch of work to think this through
         return
     }
-    private fun assertIsConnected(): Boolean
-    {
+
+    private fun assertIsConnected(): Boolean {
         /*
         if(BotMain.jda.selfUser.idLong == 1107721065947484302L)
         {
@@ -48,11 +49,9 @@ object ConfigMySQL: ConfigFileInterface {
             return false
         }
          */
-        if(connection.isClosed)
-        {
+        if (connection.isClosed) {
             load()
-        }
-        else{
+        } else {
             connection.close()
             load()
         }
@@ -60,41 +59,52 @@ object ConfigMySQL: ConfigFileInterface {
     }
 
     //This should ONLY be called once per SQL server and only by Main through the command line argument
-    fun setupSQL(){
+    fun setupSQL() {
         assertIsConnected()
-        connection.createStatement().execute("CREATE TABLE users( " +
-                "userId BIGINT PRIMARY KEY NOT NULL UNIQUE);")
-        connection.createStatement().execute("CREATE TABLE servers(" +
-                "userId BIGINT PRIMARY KEY NOT NULL UNIQUE" +
-                "serverId BIGINT PRIMARY KEY NOT NULL UNIQUE);")
-        connection.createStatement().execute("CREATE TABLE message_cache(" +
-                "messageId BIGINT PRIMARY KEY NOT NULL UNIQUE," +
-                "content VARCHAR(1000)," +
-                "lastEdited DATETIME," +
-                "isPinned BOOLEAN);")
-        connection.createStatement().execute("CREATE TABLE strikes(" +
-                "strikeId BIGINT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT," +
-                "serverId BIGINT," +
-                "userId BIGINT," +
-                "reason VARCHAR(200)," +
-                "type VARCHAR(5)," +
-                "moderatorId BIGINT," +
-                "points INT," +
-                "time DATETIME"+
-                ");")
-        connection.createStatement().execute("CREATE TABLE boosters(" +
-                "boosterId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT," +
-                "userId BIGINT," +
-                "serverId BIGINT," +
-                "roleId BIGINT" +
-                ");")
-        connection.createStatement().execute("CREATE TABLE leveling(" +
-                "levelingId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,"+
-                "userId BIGINT," +
-                "serverId BIGINT," +
-                "voicePoints INT," +
-                "textPoints INT" +
-                ");"
+        connection.createStatement().execute(
+            "CREATE TABLE users( " +
+                    "userId BIGINT PRIMARY KEY NOT NULL UNIQUE);"
+        )
+        connection.createStatement().execute(
+            "CREATE TABLE servers(" +
+                    "userId BIGINT PRIMARY KEY NOT NULL UNIQUE" +
+                    "serverId BIGINT PRIMARY KEY NOT NULL UNIQUE);"
+        )
+        connection.createStatement().execute(
+            "CREATE TABLE message_cache(" +
+                    "messageId BIGINT PRIMARY KEY NOT NULL UNIQUE," +
+                    "content VARCHAR(1000)," +
+                    "lastEdited DATETIME," +
+                    "isPinned BOOLEAN);"
+        )
+        connection.createStatement().execute(
+            "CREATE TABLE strikes(" +
+                    "strikeId BIGINT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT," +
+                    "serverId BIGINT," +
+                    "userId BIGINT," +
+                    "reason VARCHAR(200)," +
+                    "type VARCHAR(5)," +
+                    "moderatorId BIGINT," +
+                    "points INT," +
+                    "time DATETIME" +
+                    ");"
+        )
+        connection.createStatement().execute(
+            "CREATE TABLE boosters(" +
+                    "boosterId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT," +
+                    "userId BIGINT," +
+                    "serverId BIGINT," +
+                    "roleId BIGINT" +
+                    ");"
+        )
+        connection.createStatement().execute(
+            "CREATE TABLE leveling(" +
+                    "levelingId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT," +
+                    "userId BIGINT," +
+                    "serverId BIGINT," +
+                    "voicePoints INT," +
+                    "textPoints INT" +
+                    ");"
         )
     }
 
@@ -127,9 +137,8 @@ object ConfigMySQL: ConfigFileInterface {
         }
     }
 
-    fun getStrikes(user: Long, server: Long): Array<DatabaseObject.Strike>
-    {
-        if(assertIsConnected()) {
+    fun getStrikes(user: Long, server: Long): Array<DatabaseObject.Strike> {
+        if (assertIsConnected()) {
             val query = connection.createStatement()
                 .executeQuery("SELECT strikeId, userId, serverId, reason, points, type, moderatorId, time FROM strikes WHERE userId=${user} AND serverId=$server;")
             val returnType = mutableListOf<DatabaseObject.Strike>()
@@ -152,20 +161,19 @@ object ConfigMySQL: ConfigFileInterface {
         return arrayOf();
     }
 
-    fun addBoosterItem(userId: Long, serverId: Long, roleId: Long)
-    {
-        if(assertIsConnected()) {
+    fun addBoosterItem(userId: Long, serverId: Long, roleId: Long) {
+        if (assertIsConnected()) {
             connection.createStatement()
                 .executeUpdate("INSERT INTO boosters (userId, serverId, roleId) VALUES ($userId, $serverId, $roleId);")
         }
     }
-    fun updateBoosterItem()
-    {
+
+    fun updateBoosterItem() {
         //Not needed. Placeholder for future additions
     }
-    fun getBoosterItem(userId: Long, serverId: Long): DatabaseObject.BoosterPerks?
-    {
-        if(assertIsConnected()) {
+
+    fun getBoosterItem(userId: Long, serverId: Long): DatabaseObject.BoosterPerks? {
+        if (assertIsConnected()) {
             val query = connection.createStatement()
                 .executeQuery("SELECT boosterId, userId, serverId, roleId FROM boosters WHERE userId=${userId} AND serverId=$serverId;")
             return if (!query.next()) {
@@ -179,12 +187,11 @@ object ConfigMySQL: ConfigFileInterface {
                 )
             }
         }
-        return DatabaseObject.BoosterPerks(0,0,0,0)
+        return DatabaseObject.BoosterPerks(0, 0, 0, 0)
     }
 
-    fun getBoosters(serverId: Long): Array<DatabaseObject.BoosterPerks>
-    {
-        if(assertIsConnected()) {
+    fun getBoosters(serverId: Long): Array<DatabaseObject.BoosterPerks> {
+        if (assertIsConnected()) {
             val query = connection.createStatement()
                 .executeQuery("SELECT boosterId, userId, serverId, roleId FROM boosters WHERE serverId=$serverId;")
             val returnType = mutableListOf<DatabaseObject.BoosterPerks>()
@@ -203,13 +210,13 @@ object ConfigMySQL: ConfigFileInterface {
         return arrayOf()
     }
 
-    fun removeBooster(obj: DatabaseObject.BoosterPerks)
-    {
-        if(assertIsConnected()) {
+    fun removeBooster(obj: DatabaseObject.BoosterPerks) {
+        if (assertIsConnected()) {
             connection.createStatement().executeUpdate("DELETE FROM boosters WHERE boosterId=${obj.id};")
 
         }
     }
+
     fun roleBanUser(uid: Long, gid: Long, rid: Long) {
         if (assertIsConnected()) {
             connection.createStatement()
@@ -223,9 +230,8 @@ object ConfigMySQL: ConfigFileInterface {
         }
     }
 
-    fun checkHasRoleBan(uid: Long, rid: Long): Boolean
-    {
-        if(assertIsConnected()) {
+    fun checkHasRoleBan(uid: Long, rid: Long): Boolean {
+        if (assertIsConnected()) {
             val query =
                 connection.createStatement().executeQuery("SELECT uid, rid FROM rolebans WHERE uid=$uid AND rid=$rid;")
             return query.next()
@@ -233,8 +239,8 @@ object ConfigMySQL: ConfigFileInterface {
         return false
     }
 
-    fun getLevelingPoints(userId: Long, serverId: Long): DatabaseObject.Leveling?{
-        if(assertIsConnected()) {
+    fun getLevelingPoints(userId: Long, serverId: Long): DatabaseObject.Leveling? {
+        if (assertIsConnected()) {
             val query = connection.createStatement()
                 .executeQuery("SELECT * FROM leveling WHERE userId=$userId AND serverId=$serverId;")
             if (!query.next()) {
@@ -253,6 +259,13 @@ object ConfigMySQL: ConfigFileInterface {
 
     fun getLevelingPointsOrDefault(userId: Long, serverId: Long): DatabaseObject.Leveling {
         return getLevelingPoints(userId, serverId) ?: DatabaseObject.Leveling(0, userId, serverId, 0, 0)
+    }
+
+    fun removeLevelingPoints(userId: Long, serverId: Long)
+    {
+        if (assertIsConnected()) {
+            connection.createStatement().executeUpdate("DELETE FROM rolebans WHERE userId=$userId AND serverId=$serverId;")
+        }
     }
     fun updateLevelingPoints(obj: DatabaseObject.Leveling) {
         BotMain.logger.info("textPoints: ${obj.textPoints}, voicePoints: ${obj.voicePoints}")

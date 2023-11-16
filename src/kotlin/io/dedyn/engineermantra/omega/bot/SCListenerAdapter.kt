@@ -34,7 +34,10 @@ class SCListenerAdapter : ListenerAdapter() {
                 break
             }
         }
-
+        if(ConfigMySQL.getLevelingPointsOrDefault(event.member!!.idLong, event.guild.idLong).levelingPoints > 0)
+        {
+            ConfigMySQL.removeLevelingPoints(event.member!!.idLong, event.guild.idLong)
+        }
     }
 
     override fun onGuildBan(event: GuildBanEvent) {
@@ -181,8 +184,11 @@ class SCListenerAdapter : ListenerAdapter() {
             BotMain.timerThread.registerTimer(
                 Timer(
                     {
-                        event.member.ban(0, TimeUnit.DAYS).reason("Auto-Ban by @Platinum").queue()
-                        Auditing.automodEntry(event.guild.idLong, "Banned: ${event.member.effectiveName}")
+                        //This looks strange but we need to force it to re-pull from cache instead of the old info as it will always be true
+                        if(event.jda.getGuildById(event.guild.idLong)!!.getMemberById(event.member.idLong)!!.roles.contains(autoBanRole)) {
+                            event.member.ban(0, TimeUnit.DAYS).reason("Auto-Ban by @Platinum").queue()
+                            Auditing.automodEntry(event.guild.idLong, "Banned: ${event.member.effectiveName}")
+                        }
                     },
                     5 * 60)
             )
