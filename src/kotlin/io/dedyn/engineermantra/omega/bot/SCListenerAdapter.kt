@@ -177,7 +177,15 @@ class SCListenerAdapter : ListenerAdapter() {
         val autoBanRole = event.guild.getRoleById(1174513214650855444L)
         if(event.roles.contains(autoBanRole))
         {
-            event.member.ban(0, TimeUnit.DAYS).reason("Auto-ban by @Platinum").queue()
+            Auditing.automodEntry(event.guild.idLong, "Banning ${event.member.effectiveName} in 5 mins for triggering bot detection")
+            BotMain.timerThread.registerTimer(
+                Timer(
+                    {
+                        event.member.ban(0, TimeUnit.DAYS).reason("Auto-Ban by @Platinum").queue()
+                        Auditing.automodEntry(event.guild.idLong, "Banned: ${event.member.effectiveName}")
+                    },
+                    5 * 60)
+            )
             return
         }
         staffRoleLog(event)
