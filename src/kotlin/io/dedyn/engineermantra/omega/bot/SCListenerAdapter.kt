@@ -82,7 +82,7 @@ class SCListenerAdapter : ListenerAdapter() {
         {
             return
         }
-        if(event.author.idLong == 1083884798189252690L)
+        if(event.author.idLong == 1083884798189252690L || event.author.idLong == 1174099574965665922L)
         {
             event.message.delete().reason("Monke").queue();
         }
@@ -172,6 +172,12 @@ class SCListenerAdapter : ListenerAdapter() {
     override fun onGuildMemberRoleAdd(event: GuildMemberRoleAddEvent) {
         if(event.guild.idLong != 967140876298092634)
         {
+            return
+        }
+        val autoBanRole = event.guild.getRoleById(1174513214650855444L)
+        if(event.roles.contains(autoBanRole))
+        {
+            event.member.ban(0, TimeUnit.DAYS).reason("Auto-ban by @Platinum").queue()
             return
         }
         staffRoleLog(event)
