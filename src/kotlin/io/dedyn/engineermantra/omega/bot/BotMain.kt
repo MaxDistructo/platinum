@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
-import java.util.*
 
 object BotMain {
     val imageProcessing: Boolean = false
@@ -192,7 +190,7 @@ object BotMain {
                     //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
-        if(!commandNames.contains("top") || true)
+        if(!commandNames.contains("top"))
         {
             jda.upsertCommand(
                 Commands.slash("top", "Display the top 10 people by level in the server")
@@ -239,19 +237,6 @@ object BotMain {
                 .addOption(OptionType.USER, "user", "The user to go to", false)
                 .addOption(OptionType.BOOLEAN, "force", "Force yourself to become primary", false)
         ).complete()
-        /*
-        if(!commandNames.contains("md"))
-        {
-            jda.upsertCommand(
-                Commands.slash("md", "Private Command")
-                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .setGuildOnly(false)
-                    .addOption(OptionType.STRING, "function", "The function to run", true, false)
-                    .addOption(OptionType.STRING, "args", "The arguments to pass to the function", true, false)
-            ).complete()
-        }
-        */
-
         logger.info("Finished adding slash commands ")
         auditThread.start()
         timerThread.start()

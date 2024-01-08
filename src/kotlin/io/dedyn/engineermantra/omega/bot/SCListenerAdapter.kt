@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.sourceforge.tess4j.Tesseract
 import java.io.File
@@ -63,6 +64,18 @@ class SCListenerAdapter : ListenerAdapter() {
         if(event.guild.idLong == 967140876298092634L)
         {
             removeRolesInServer(event.member.idLong, 1165357291629989979L, event.roles)
+        }
+    }
+
+    override fun onRoleDelete(event: RoleDeleteEvent) {
+        if(event.guild.idLong == 967140876298092634L){
+            val otherGuild = event.jda.getGuildById(1165357291629989979L)
+            val toDelete = otherGuild!!.getRolesByName(event.role.name, true)
+            if(toDelete.isEmpty())
+            {
+                return
+            }
+            toDelete[0].delete().queue()
         }
     }
 
@@ -195,7 +208,7 @@ class SCListenerAdapter : ListenerAdapter() {
             return
         }
         staffRoleLog(event)
-        //This is for the Birthday Role. 24 hours after it's applyed, the bot will automatically remove it from the member.
+        //This is for the Birthday Role. 24 hours after it's applied, the bot will automatically remove it from the member.
         if(event.roles[0].idLong == 1129010319432364042)
         {
             BotMain.timerThread.registerTimer(Timer({event.guild.removeRoleFromMember(event.member, event.roles[0])}, 24*60*60))
