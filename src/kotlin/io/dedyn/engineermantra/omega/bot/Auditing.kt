@@ -82,6 +82,10 @@ object Auditing {
         }
     }
 
+    /**
+     * Role Audit cleans up after ourselves in-case we didn't or was timed out when keeping the server roles in sync.
+     */
+
     fun roleAudit(guild: Guild)
     {
         val botcGuild = BotMain.jda.getGuildById(1165357291629989979L)

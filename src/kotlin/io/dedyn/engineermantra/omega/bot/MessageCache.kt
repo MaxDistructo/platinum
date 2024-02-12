@@ -106,7 +106,7 @@ class MessageCache{
         scope.cancel()
     }
 
-    private fun pruneCache()
+    public fun pruneCache()
     {
         isLocked = true
         val deleteQueue = mutableListOf<Long>()
@@ -114,6 +114,12 @@ class MessageCache{
         {
             //If the current time is the time of last edit +30 days and is not pinned, remove it from the cache.
             if(Clock.systemUTC().instant().toEpochMilli() > (message.value.lastEdited + 2592000000) && !message.value.isPinned){
+                deleteQueue.add(message.key)
+            }
+            //Assuming that JDA's user cache is within policy, if we cannot find the user we assume they have been deleted
+            //or are otherwise out of scope spec so per retention policy we remove any message attributed to them.
+            if(BotMain.jda.getUserById(message.value.author) == null)
+            {
                 deleteQueue.add(message.key)
             }
         }

@@ -29,18 +29,26 @@ import java.util.concurrent.TimeUnit
 class SCListenerAdapter : ListenerAdapter() {
     override fun onGuildMemberRemove(event: GuildMemberRemoveEvent) {
         //Remove all data we have on this member when they leave the server.
+        //Boosting should be removed IMMEDIATELY as there is no reason to keep this information.
         for (booster in ConfigMySQL.getBoosters(event.guild.idLong)) {
             if (booster.userId == event.member!!.idLong) {
                 ConfigMySQL.removeBooster(booster)
                 break
             }
         }
+        /** FIXME:
+         * Retention Policy is 30 days, don't delete until 30 days later so if unban/rejoin we can restore
+         * this state if it was an accidental ban.
+         */
         if(ConfigMySQL.getLevelingPointsOrDefault(event.member!!.idLong, event.guild.idLong).levelingPoints > 0)
         {
             ConfigMySQL.removeLevelingPoints(event.member!!.idLong, event.guild.idLong)
         }
     }
 
+    /**
+     * Bans are Synchronized to BOTC Server from SC.
+     */
     override fun onGuildBan(event: GuildBanEvent) {
         if(event.guild.idLong == 967140876298092634L)
         {
@@ -48,6 +56,9 @@ class SCListenerAdapter : ListenerAdapter() {
         }
     }
 
+    /**
+     * Unbans are Synchronized to BOTC Server from SC.
+     */
     override fun onGuildUnban(event: GuildUnbanEvent) {
         if(event.guild.idLong == 967140876298092634L)
         {
@@ -55,6 +66,9 @@ class SCListenerAdapter : ListenerAdapter() {
         }
     }
 
+    /**
+     * Roles are Synchronized to BOTC Server from SC.
+     */
     override fun onGuildMemberRoleRemove(event: GuildMemberRoleRemoveEvent) {
         if (event.guild.idLong == 967140876298092634L &&
             event.roles.contains(event.guild.getRoleById(1078829209616666705)))
@@ -79,6 +93,10 @@ class SCListenerAdapter : ListenerAdapter() {
         }
     }
 
+    /**
+     * Button logic for SC's Sensitive Topics entry channel
+     */
+
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (event.isFromGuild && event.guildChannel.idLong == 1121230172155302019 && event.button.id == "agree") {
             val channel = event.guild!!.getGuildChannelById(1087346724474998796)
@@ -92,6 +110,14 @@ class SCListenerAdapter : ListenerAdapter() {
         event.message.delete().queue()
         message.deleteOriginal().queue()
     }
+
+    /**
+     * SC Specific message logic
+     * - Deletes images containing words that are banned. This is a common Automod bypass
+     * - Deletes common executables if they are uploaded
+     *
+     * Image Processing is currently disabled!
+     */
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if(!event.isFromGuild)
@@ -126,7 +152,7 @@ class SCListenerAdapter : ListenerAdapter() {
                         )
                         return
                     }
-                    if (attachment.fileExtension!!.contains("pkg") || attachment.fileName.contains(".pkg")) {
+                    if (attachment.fileExtension!!.contains("pkg") || attachment.fileName.contains(".pkg") || attachment.fileExtension!!.contains("dmg") || attachment.fileName.contains(".dmg")) {
                         event.message.delete().queue()
                         Auditing.automodEntry(
                             event.guild.idLong,

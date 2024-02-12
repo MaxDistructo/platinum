@@ -94,6 +94,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         return outputList
     }
 
+    /**
+     * Catches when someone is given the Booster role so and DMs them with the information on how to use the perks
+     * we provide to them for doing so.
+     */
     override fun onGuildMemberRoleAdd(event: GuildMemberRoleAddEvent)
     {
         if(event.roles.contains(event.guild.boostRole))
@@ -528,6 +532,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
     }
 
+    /**
+     * Blood on the Clocktower Server commands
+     * These are NOT enabled in most servers.
+     */
     fun moveToNight(event: SlashCommandInteractionEvent){
         event.reply("GO TO SLEEP!").queue()
         val vc_members = event.guild!!.getVoiceChannelById(1165358627209617588L)!!.members
@@ -649,6 +657,11 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
     }
 
+    /**
+     * THE PURGE!!!!!!!!
+     * Our goal here is to remove ALL members who have not been active in the server so that we can have an accurate
+     * number of people in the server. Bots are way too common anymore.
+     */
     fun thePurge(event: SlashCommandInteractionEvent) {
         if(event.guild!!.idLong != 967140876298092634L)
         {
@@ -720,6 +733,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
 
     }
+
+    /**
+     * Simple top command for our custom Leveling System
+     */
 
     fun levelTop(event: SlashCommandInteractionEvent) {
         val pageNum = event.getOption("page")?.asInt ?: 1

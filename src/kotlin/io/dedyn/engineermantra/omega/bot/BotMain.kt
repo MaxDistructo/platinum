@@ -246,6 +246,8 @@ object BotMain {
         override fun run(){
             while(true){
                 Auditing.runAuditing(jda)
+                //We need to run this daily so that we meet Discord's 30-day retention policy
+                messageCache.pruneCache()
                 sleep(86400000L)
             }
         }

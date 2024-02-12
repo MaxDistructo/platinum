@@ -32,6 +32,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
                 return
             }
         }
+        //To make this a bit less annoying, we will add a random amount of points between 1 and 10
         val random = Random.Default
         BotMain.logger.info("Granting Text Points to " + event.author.effectiveName)
         val leveling = ConfigMySQL.getLevelingPointsOrDefault(event.author.idLong, event.guild.idLong)
@@ -41,7 +42,7 @@ class LevelingListenerAdapter: ListenerAdapter() {
         BotMain.logger.info("New Points: " + leveling.levelingPoints)
         ConfigMySQL.updateLevelingPoints(leveling)
         val newLevel = calculateLevel(leveling.levelingPoints)
-        //We are going to use an exponential curve on leveling
+        //This follows the Medium-Slow leveling curve from Pokémon.
         if(newLevel > currentLevel){
             if(DiscordUtils.checkLeveledRoles(event.member!!)) {
                 event.message.reply("${event.member!!.asMention} has leveled up to $newLevel!").queue()
@@ -86,7 +87,9 @@ class LevelingListenerAdapter: ListenerAdapter() {
         userList[member.idLong] = leaveTime
     }
 
-    //Triggers when a user joins/leaves VC
+    /**
+     * Detect when a user joins or leaves a VC so that we can give points on leave yet not allow AFKing for points.
+     */
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
         if(event.guild.idLong != 967140876298092634)
         {
