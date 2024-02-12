@@ -139,6 +139,7 @@ object DiscordUtils {
                 guild.addRoleToMember(member, guild.getRolesByName("Trusted User", false)[0]).queue()
             }
         }
+        //Only send a message if they leveled up to a point where additional permissions are granted.
         if(level == 10 || level == 25)
         {
             return true

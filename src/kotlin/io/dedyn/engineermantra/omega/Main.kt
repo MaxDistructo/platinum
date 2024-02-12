@@ -3,7 +3,6 @@ package io.dedyn.engineermantra.omega
 import ch.qos.logback.classic.Logger
 import io.dedyn.engineermantra.omega.bot.BotMain
 import io.dedyn.engineermantra.omega.shared.ConfigFileJson
-import io.dedyn.engineermantra.omega.website.WebMain
 import kotlinx.coroutines.*
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -44,8 +43,8 @@ object Main {
         //Now that we have a long-running process, run the WebMain
         websiteScope.launch{
             BotMain.logger.info("Starting up website")
-            val webMain = WebMain()
-            webMain.main(arrayOf())
+            //val webMain = WebMain()
+            //webMain.main(arrayOf())
         }
         //And follow with the bot main.
         botScope.launch {
