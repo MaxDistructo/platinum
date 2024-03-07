@@ -62,7 +62,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "promote" -> promoteMember(event)
             //"purge" -> thePurge(event)
             "top" -> levelTop(event)
-            "migrateUsers" -> migrateUser(event);
+            "migrate_user" -> migrateUser(event);
             else -> println("Command not found")
         }
     }

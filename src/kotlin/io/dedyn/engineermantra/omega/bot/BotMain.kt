@@ -190,7 +190,8 @@ object BotMain {
                     //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
-        if(!commandNames.contains("migrateUser")) {
+        //REMEMBER!!!! COMMAND NAMES MUST BE LOWER CASE!
+        if(!commandNames.contains("migrate_user")) {
             jda.upsertCommand(
                 Commands.slash("migrateUser", "Migrate user")
                     .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
