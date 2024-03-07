@@ -62,9 +62,12 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "promote" -> promoteMember(event)
             //"purge" -> thePurge(event)
             "top" -> levelTop(event)
+            "migrateUsers" -> migrateUser(event);
             else -> println("Command not found")
         }
     }
+
+
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
@@ -784,6 +787,25 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 audioManager.receivingHandler = ReceivingHandler()
             }
         }
+    }
+
+    private fun migrateUser(event: SlashCommandInteractionEvent) {
+        if(!event.isFromGuild)
+        {
+            return
+        }
+        event.deferReply().queue()
+        //First, fix all the roles.
+        val srcUser = event.getOption("srcUser")!!.asMember!!
+        val destUser = event.getOption("destUser")!!.asMember!!
+        DiscordUtils.addRolesInServer(destUser.idLong, destUser.guild.idLong, srcUser.roles)
+        //Now that the visual changes are done, fix the leveling points
+        val srcLevel = ConfigMySQL.getLevelingPointsOrDefault(srcUser.idLong, srcUser.guild.idLong)
+        val destLevel = ConfigMySQL.getLevelingPointsOrDefault(destUser.idLong, destUser.guild.idLong)
+        destLevel.textPoints = srcLevel.textPoints
+        destLevel.voicePoints = srcLevel.voicePoints
+        ConfigMySQL.updateLevelingPoints(destLevel)
+        event.reply("Done").queue()
     }
 }
 

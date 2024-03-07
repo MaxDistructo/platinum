@@ -190,6 +190,15 @@ object BotMain {
                     //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
+        if(!commandNames.contains("migrateUser")) {
+            jda.upsertCommand(
+                Commands.slash("migrateUser", "Migrate user")
+                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                    .setGuildOnly(true)
+                    .addOption(OptionType.USER, "srcUser", "The user to get the roles and stats from", true, false)
+                    .addOption(OptionType.USER, "destUser", "The user to give the roles and stats to", true, false)
+            ).complete()
+        }
         if(!commandNames.contains("top"))
         {
             jda.upsertCommand(
