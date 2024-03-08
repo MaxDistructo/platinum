@@ -44,7 +44,7 @@ dependencies {
     implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.3.3")
     implementation(group = "net.java.dev.jna", name = "jna", version = "5.14.0")
     implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.14.0")
-    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.10.0")
+    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.11.0")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-core", version = "5prealpha-SNAPSHOT")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-data", version = "5prealpha-SNAPSHOT")
     /**
