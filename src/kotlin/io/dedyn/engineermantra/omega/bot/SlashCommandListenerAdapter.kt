@@ -1,6 +1,7 @@
 package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.bot.BotMain.logger
+import io.dedyn.engineermantra.omega.bot.DiscordUtils.getRoleFromServer
 import io.dedyn.engineermantra.omega.bot.voice.ReceivingHandler
 import io.dedyn.engineermantra.omega.shared.ConfigFileJson
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
@@ -519,19 +520,42 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
 
     fun syncRoles(event: SlashCommandInteractionEvent) {
         event.reply("Started sync. This will take a while.").queue();
-        for(member in event.guild!!.members)
-        {
-            if(member.idLong != 1107721065947484302) {
+        //Sync to BOTC from SC
+        for(member in event.guild!!.members) {
+            if (member.idLong != 1107721065947484302) {
                 DiscordUtils.addRolesInServer(
                     member.idLong,
                     event.guild!!.idLong,
                     BotMain.jda.getGuildById(967140876298092634L)!!.getMemberById(member.idLong)!!.roles
                 )
             }
+            val scMember = BotMain.jda.getGuildById(967140876298092634)!!.getMemberById(member.idLong)
+            val toRemove = mutableListOf<Role>()
+            if (scMember != null){
+                for (role in member.roles) {
+                    if (!(scMember.roles.contains(getRoleFromServer(967140876298092634, role.name)))) {
+                        toRemove.add(role)
+                    }
+                }
+                DiscordUtils.removeRolesInServer(member.idLong, event.guild!!.idLong, toRemove)
+            }
         }
+        //Sync Bans
         for(member in event.jda.getGuildById(967140876298092634)!!.retrieveBanList())
         {
             event.guild!!.ban(member.user,0, TimeUnit.SECONDS).reason(member.reason).queue()
+        }
+        //Check all roles and check if color has been changed, or it doesn't exist anymore in SC
+        for(role in event.guild!!.roles)
+        {
+            val scRole = getRoleFromServer(967140876298092634, role.name)
+            if(scRole == null){
+                role.delete().queue()
+            }
+            else if(role.color != scRole.color)
+            {
+                role.manager.setColor(scRole.color).queue()
+            }
         }
     }
 

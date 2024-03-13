@@ -191,4 +191,15 @@ object DiscordUtils {
             return roleAction.complete()
         }
     }
+
+    fun getRoleFromServer(serverId: Long, roleName: String): Role?
+    {
+        val guild = BotMain.jda.getGuildById(serverId)!!
+        val roles = guild.getRolesByName(roleName, false)
+        if(roles.size > 0)
+        {
+            return roles[0]
+        }
+        return null
+    }
 }

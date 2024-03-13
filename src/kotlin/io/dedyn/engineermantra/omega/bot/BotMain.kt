@@ -28,6 +28,7 @@ object BotMain {
         jda.addEventListener(LevelingListenerAdapter())
         //Parse the known commands that we have and register any new ones but not do the old
         val commandNames = mutableListOf<String>()
+        jda.deleteCommandById("record").queue()
         for(command in jda.retrieveCommands().complete())
         {
             commandNames.add(command.name)
@@ -182,16 +183,8 @@ object BotMain {
                     .addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
-        if(!commandNames.contains("record")) {
-            jda.upsertCommand(
-                Commands.slash("record", "Record the voice chat in this channel")
-                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .setGuildOnly(true)
-                    //.addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
-            ).complete()
-        }
         //REMEMBER!!!! COMMAND NAMES MUST BE LOWER CASE!
-        if(!commandNames.contains("migrate_user")) {
+        if(!commandNames.contains("migrateuser")) {
             jda.upsertCommand(
                 Commands.slash("migrateUser", "Migrate user")
                     .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
