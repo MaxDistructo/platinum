@@ -549,12 +549,16 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         for(role in event.guild!!.roles)
         {
             val scRole = getRoleFromServer(967140876298092634, role.name)
-            if(scRole == null){
+            if(role.name == "Storyteller") {
+                continue
+            }
+            if(scRole == null && role.name != "Storyteller"){
                 role.delete().queue()
             }
-            else if(role.color != scRole.color)
+            //This is not null here, the above enforces it. Some reason this doesn't agree
+            else if(role.color != scRole!!.color)
             {
-                role.manager.setColor(scRole.color).queue()
+                role.manager.setColor(scRole!!.color).queue()
             }
         }
     }
