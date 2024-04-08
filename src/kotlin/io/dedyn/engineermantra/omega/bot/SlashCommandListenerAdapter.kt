@@ -293,7 +293,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     fun giveStrike(event: SlashCommandInteractionEvent)
     {
         assert(event.isFromGuild)
-        event.reply("Issuing Strike").queue()
+
         val strike_type = event.getOption("strike_type")!!.asString.lowercase()
         val points = event.getOption("points")?.asInt ?: 0
         //We first check if they have event perms to give event strikes
@@ -311,9 +311,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         if(event.member!!.hasPermission(Permission.MANAGE_EVENTS) && strike_type == "event")
         {
             //Perform the action
-            ConfigMySQL.addStrike(strike)
+            val id = ConfigMySQL.addStrike(strike)
+            event.reply("Issuing Strike ${id}").queue()
             //Respond to user
-            event.reply("Applied event strike to ${event.getOption("user")!!.asUser.asMention}").queue()
+            //event.reply("Applied event strike to ${event.getOption("user")!!.asUser.asMention}").queue()
             //Optional action after
             if(event.getOption("send_dm")?.asBoolean ?: true)
             {
@@ -331,8 +332,10 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         else if(event.member!!.hasPermission(Permission.MESSAGE_MANAGE) && strike_type == "server")
         {
             strike.type = "svr"
-            ConfigMySQL.addStrike(strike)
-            event.reply("Applied strike to ${event.getOption("user")!!.asUser.asMention}").queue()
+            //Tell the user what the strike ID is so that they can edit it immediately
+            val id = ConfigMySQL.addStrike(strike)
+            event.reply("Issuing Strike ${id}").queue()
+            //event.reply("Applied strike to ${event.getOption("user")!!.asUser.asMention}").queue()
             if(event.getOption("send_dm")?.asBoolean ?: true)
             {
                 val private_channel = event.getOption("user")!!.asUser.openPrivateChannel().complete()
@@ -348,8 +351,9 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         else if(event.member!!.hasPermission(Permission.MANAGE_ROLES) && strike_type == "soundboard")
         {
             strike.type = "sbrd"
-            ConfigMySQL.addStrike(strike)
-            event.reply("Applied strike to ${event.getOption("user")!!.asUser.asMention}").queue()
+            val id = ConfigMySQL.addStrike(strike)
+            event.reply("Issuing Strike ${id}").queue()
+            //event.reply("Applied strike to ${event.getOption("user")!!.asUser.asMention}").queue()
             if(event.getOption("send_dm")?.asBoolean ?: true)
             {
                 val private_channel = event.getOption("user")!!.asUser.openPrivateChannel().complete()

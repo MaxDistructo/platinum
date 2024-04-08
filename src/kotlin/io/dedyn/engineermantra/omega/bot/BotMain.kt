@@ -28,7 +28,7 @@ object BotMain {
         jda.addEventListener(LevelingListenerAdapter())
         //Parse the known commands that we have and register any new ones but not do the old
         val commandNames = mutableListOf<String>()
-        jda.deleteCommandById("record").queue()
+        //jda.deleteCommandById("record").queue()
         for(command in jda.retrieveCommands().complete())
         {
             commandNames.add(command.name)

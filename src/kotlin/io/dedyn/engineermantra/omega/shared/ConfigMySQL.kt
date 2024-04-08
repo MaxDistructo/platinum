@@ -108,9 +108,9 @@ object ConfigMySQL: ConfigFileInterface {
         )
     }
 
-    fun addStrike(strike: DatabaseObject.Strike) {
+    fun addStrike(strike: DatabaseObject.Strike): Int {
         if (assertIsConnected()) {
-            connection.createStatement().executeUpdate(
+            return connection.createStatement().executeUpdate(
                 "INSERT INTO strikes (userId, serverId, reason, type, points, moderatorId, time) VALUES (${strike.userId}, ${strike.serverId}, \"${
                     strike.reason!!.replace(
                         "\"",
@@ -119,6 +119,7 @@ object ConfigMySQL: ConfigFileInterface {
                 }\", \"${strike.type}\", ${strike.points}, ${strike.moderatorId}, NOW());"
             )
         }
+        return -1
     }
 
     fun updateStrike(strikeId: Long, reason: String?, points: Int?) {
