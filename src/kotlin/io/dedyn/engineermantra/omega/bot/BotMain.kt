@@ -28,12 +28,22 @@ object BotMain {
         jda.addEventListener(LevelingListenerAdapter())
         //Parse the known commands that we have and register any new ones but not do the old
         val commandNames = mutableListOf<String>()
-        //jda.deleteCommandById("record").queue()
-        for(command in jda.retrieveCommands().complete())
+        val commands = jda.retrieveCommands().complete()
+        for(command in commands)
         {
-            commandNames.add(command.name)
+            if(command.name == "record"){
+                jda.deleteCommandById(command.id).queue();
+            }
+            else if(command.name == "poll") {
+                jda.deleteCommandById(command.id).queue();
+            }
+            else if(command.name == "vote"){
+                jda.deleteCommandById(command.id).queue();
+            }
+            else{
+                commandNames.add(command.name)
+            }
         }
-
         if(!commandNames.contains("ping")) {
             jda.upsertCommand("ping", "Ping the bot").complete()
         }
@@ -149,6 +159,7 @@ object BotMain {
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
             ).complete()
         }
+        /**
         if(!commandNames.contains("poll")) {
             jda.upsertCommand(
                 Commands.slash("poll", "Create a poll")
@@ -175,6 +186,7 @@ object BotMain {
                     .addOption(OptionType.STRING, "prompt", "What do you want to ask about?", true, false)
             ).complete()
         }
+        */
         if(!commandNames.contains("level")) {
             jda.upsertCommand(
                 Commands.slash("level", "View your level")
