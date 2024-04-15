@@ -45,7 +45,8 @@ class LoggerListenerAdapter : ListenerAdapter() {
     {
         if (event.isFromGuild && event.guild.idLong == 967140876298092634L) {
             ioScope.launch {
-                var user: User? = null
+                //Default to TempVoice
+                var user: User? = event.guild.getMemberById("762217899355013120")!!.user
                 //Pull the user from the audit log. We'll have to wait for this as the rest of the logic
                 //relies on this completing.
                 event.guild.retrieveAuditLogs()
@@ -72,7 +73,8 @@ class LoggerListenerAdapter : ListenerAdapter() {
                     //Another assumption based on how TempBot works. It sets the VC owner with a member perm.
                     val perms = channel.memberPermissionOverrides
                     for (perm in perms) {
-                        if (perm.allowed.contains(Permission.VOICE_MOVE_OTHERS)) {
+                        //Small bug in this made it detect TempVoice more often than not. Fix this by excluding TempVoice.
+                        if (perm.allowed.contains(Permission.VOICE_MOVE_OTHERS) && perm.member!!.id != "762217899355013120") {
                             //Hello VC owner
                             member = perm.member!!
                             voiceCache[channel.idLong] = member.idLong
@@ -92,7 +94,8 @@ class LoggerListenerAdapter : ListenerAdapter() {
     override fun onPermissionOverrideCreate(event: PermissionOverrideCreateEvent) {
         println("Permission Override")
         ioScope.launch {
-            var moderator: Member? = null
+            //Default to TempVoice
+            var moderator: Member? = event.guild.getMemberById("762217899355013120")
             //Pull the user from the audit log. We'll have to wait for this as the rest of the logic
             //relies on this completing.
             println("Looking for who is responsible")
@@ -119,7 +122,8 @@ class LoggerListenerAdapter : ListenerAdapter() {
                 val perms = channel.memberPermissionOverrides
                 println("Searching for VC Owner")
                 for (perm in perms) {
-                    if (perm.allowed.contains(Permission.VOICE_MOVE_OTHERS)) {
+                    //Small bug in this made it detect TempVoice more often than not. Fix this by excluding TempVoice.
+                    if (perm.allowed.contains(Permission.VOICE_MOVE_OTHERS) && perm.member!!.id != "762217899355013120") {
                         //Hello VC owner
                         voiceCache[channel.idLong] = perm.member!!.idLong
                         moderator = perm.member!!
@@ -162,7 +166,7 @@ class LoggerListenerAdapter : ListenerAdapter() {
     {
         println("Permission Override")
         ioScope.launch {
-            var moderator: Member? = null
+            var moderator: Member? = event.guild.getMemberById("762217899355013120")
             //Pull the user from the audit log. We'll have to wait for this as the rest of the logic
             //relies on this completing.
             println("Looking for who is responsible")
@@ -187,7 +191,7 @@ class LoggerListenerAdapter : ListenerAdapter() {
                 val perms = channel.memberPermissionOverrides
                 //println("Searching for VC Owner")
                 for (perm in perms) {
-                    if (perm.allowed.contains(Permission.VOICE_MOVE_OTHERS)) {
+                    if (perm.allowed.contains(Permission.VOICE_MOVE_OTHERS) && perm.member!!.id != "762217899355013120") {
                         //Hello VC owner
                         voiceCache[channel.idLong] = perm.member!!.idLong
                         moderator = perm.member!!
