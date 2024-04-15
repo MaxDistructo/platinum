@@ -204,8 +204,8 @@ object BotMain {
                 Commands.slash("migrate_user", "Migrate user")
                     .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                     .setGuildOnly(true)
-                    .addOption(OptionType.USER, "srcUser", "The user to get the roles and stats from", true, false)
-                    .addOption(OptionType.USER, "destUser", "The user to give the roles and stats to", true, false)
+                    .addOption(OptionType.USER, "src_user", "The user to get the roles and stats from", true, false)
+                    .addOption(OptionType.USER, "dest_user", "The user to give the roles and stats to", true, false)
             ).complete()
         }
         if(!commandNames.contains("top"))
