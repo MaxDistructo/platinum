@@ -29,19 +29,22 @@ object BotMain {
         //Parse the known commands that we have and register any new ones but not do the old
         val commandNames = mutableListOf<String>()
         val commands = jda.retrieveCommands().complete()
+        //Get rid of old commands from the Bot
         for(command in commands)
         {
-            if(command.name == "record"){
-                jda.deleteCommandById(command.id).queue();
-            }
-            else if(command.name == "poll") {
-                jda.deleteCommandById(command.id).queue();
-            }
-            else if(command.name == "vote"){
-                jda.deleteCommandById(command.id).queue();
-            }
-            else{
-                commandNames.add(command.name)
+            when (command.name) {
+                "record" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
+                "poll" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
+                "vote" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
+                else -> {
+                    commandNames.add(command.name)
+                }
             }
         }
         if(!commandNames.contains("ping")) {
@@ -196,9 +199,9 @@ object BotMain {
             ).complete()
         }
         //REMEMBER!!!! COMMAND NAMES MUST BE LOWER CASE!
-        if(!commandNames.contains("migrateuser")) {
+        if(!commandNames.contains("migrate_user")) {
             jda.upsertCommand(
-                Commands.slash("migrateUser", "Migrate user")
+                Commands.slash("migrate_user", "Migrate user")
                     .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                     .setGuildOnly(true)
                     .addOption(OptionType.USER, "srcUser", "The user to get the roles and stats from", true, false)
