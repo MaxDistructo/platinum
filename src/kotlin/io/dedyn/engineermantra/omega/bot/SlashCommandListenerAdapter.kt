@@ -68,8 +68,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
     }
 
-
-
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
         {
@@ -79,7 +77,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             else -> println("Autocomplete not found. Please check your command configuration. Missing: ${event.focusedOption.name}")
         }
     }
-
 
     //This is part of the AutoComplete code
     fun choices(partial_word: String, autocompleteName: String): List<Command.Choice>
@@ -462,38 +459,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         Auditing.runAuditing(event.jda)
     }
 
-    fun createPoll(event: SlashCommandInteractionEvent)
-    {
-        val emoji = listOf(":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":zero:")
-        val emoji_codepoint = listOf("U+0031 U+20E3", "U+0032 U+20E3", "U+0033 U+20E3", "U+0034 U+20E3","U+0035 U+20E3","U+0036 U+20E3","U+0037 U+20E3","U+0038 U+20E3","U+0039 U+20E3","U+0030 U+20E3")
-        //We do null checks here based on the requirements setup in BotMain
-        val prompt = event.getOption("prompt")!!.asString
-        //val options = mutableListOf<String>(, event.getOption("option2")?.asString ?: "no")
-        var i = 1
-        val sb = StringBuilder()
-        while(i <= 10)
-        {
-            if(i == 1)
-            {
-                sb.append("${emoji[i-1]} - ${event.getOption("option1")?.asString ?: "yes"}\n")
-            }
-            else if(i == 2)
-            {
-                sb.append("${emoji[i-1]} - ${event.getOption("option2")?.asString ?: "no"}\n")
-            }
-            else {
-                sb.append("${emoji[i-1]} - ${event.getOption("option$i")?.asString ?: break}\n")
-            }
-            i++
-        }
-        event.reply("Done!").setEphemeral(true).queue()
-        val message = event.channel.sendMessageEmbeds(DiscordUtils.simpleTitledEmbed(event.member!!, prompt, sb.toString(), event.guild!!)).complete()
-        var ii = 1
-        while(ii < i) {
-            message.addReaction(Emoji.fromFormatted(emoji_codepoint[ii-1])).queue()
-            ii++
-        }
-    }
     fun ruleAgreement(event: SlashCommandInteractionEvent)
     {
         //Command is dumb and lets the individual server listeners handle the button's action
@@ -521,7 +486,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             event.guild!!
         )).queue()
     }
-
     fun syncRoles(event: SlashCommandInteractionEvent) {
         event.reply("Started sync. This will take a while.").queue();
         //Sync to BOTC from SC
@@ -566,7 +530,6 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             }
         }
     }
-
     /**
      * Blood on the Clocktower Server commands
      * These are NOT enabled in most servers.

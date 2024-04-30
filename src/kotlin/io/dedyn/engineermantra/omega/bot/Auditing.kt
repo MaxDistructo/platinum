@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import java.time.Instant
 
 object Auditing {
     fun auditEntry(serverId: Long, string: String)
@@ -30,6 +31,7 @@ object Auditing {
             for (guild in jda.guilds) {
                 boosterAudit(jda.selfUser, guild)
                 roleAudit(guild)
+                botAudit(guild)
             }
         }
     }
@@ -101,6 +103,36 @@ object Auditing {
                 if(guild.getRolesByName(role.name, false).isEmpty())
                 {
                     role.delete().queue()
+                }
+            }
+        }
+    }
+
+    fun botAudit(guild: Guild){
+        //Only apply to SC
+        if(guild.idLong == 967140876298092634L) {
+            val botRoleArray: ArrayList<Role> = ArrayList();
+            botRoleArray.add(guild.getRoleById(967165505414787162)!!)
+            botRoleArray.add(guild.getRoleById(967561913443688460)!!)
+            botRoleArray.add(guild.getRoleById(1066535405131935814)!!)
+            botRoleArray.add(guild.getRoleById(970108033009057822)!!)
+            for (member in guild.members) {
+                //If the current time is 48 hours or more than when the user joined, we need to check the user's roles
+                if (Instant.now().epochSecond - member.timeJoined.toEpochSecond() > 1.728e+8) {
+                    //If their only role is DJ, kick them
+                    if (member.roles.size == 1 && member.roles[0].equals(guild.getRoleById(1078829209616666705))) {
+                        val leveling = ConfigMySQL.getLevelingPoints(member.idLong, guild.idLong)
+                        if(leveling == null || leveling.levelingPoints == 0) {
+                            member.kick().reason("Platinum: Likely Bot Kick");
+                        }
+                    }
+                    //Roles are the known list of roles that bots select. Kick them if they don't have any leveling points
+                    else if (member.roles.size == 4 && member.roles == botRoleArray.toList()) {
+                        val leveling = ConfigMySQL.getLevelingPoints(member.idLong, guild.idLong)
+                        if(leveling == null || leveling.levelingPoints == 0){
+                            member.kick().reason("Platinum: Likely Bot Kick")
+                        }
+                    }
                 }
             }
         }
