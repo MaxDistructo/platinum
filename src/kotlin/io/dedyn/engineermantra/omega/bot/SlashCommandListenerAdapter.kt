@@ -791,12 +791,12 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
         event.deferReply().queue()
         //First, fix all the roles.
-        val srcUser = event.getOption("srcUser")!!.asMember!!
-        val destUser = event.getOption("destUser")!!.asMember!!
-        DiscordUtils.addRolesInServer(destUser.idLong, destUser.guild.idLong, srcUser.roles)
+        val srcUser = event.getOption("srcUser")!!.asUser
+        val destUser = event.getOption("destUser")!!.asUser
+        //DiscordUtils.addRolesInServer(destUser.idLong, destUser.guild.idLong, srcUser.roles)
         //Now that the visual changes are done, fix the leveling points
-        val srcLevel = ConfigMySQL.getLevelingPointsOrDefault(srcUser.idLong, srcUser.guild.idLong)
-        val destLevel = ConfigMySQL.getLevelingPointsOrDefault(destUser.idLong, destUser.guild.idLong)
+        val srcLevel = ConfigMySQL.getLevelingPointsOrDefault(srcUser.idLong, event.guild!!.idLong)
+        val destLevel = ConfigMySQL.getLevelingPointsOrDefault(destUser.idLong, event.guild!!.idLong)
         destLevel.textPoints = srcLevel.textPoints
         destLevel.voicePoints = srcLevel.voicePoints
         ConfigMySQL.updateLevelingPoints(destLevel)

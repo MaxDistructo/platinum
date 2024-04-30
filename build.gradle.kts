@@ -6,11 +6,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
     }
 }
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
     //id("com.github.johnrengelman.shadow") version "7.1.2"
     //id "com.github.ben-manes.versions" version "0.20.0"
     //id 'com.sedmelluq.jdaction' version '1.0.2'
@@ -33,9 +33,9 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "1.9.22")
+    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "1.9.23")
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.8.0")
-    implementation(group = "org.json", name = "json", version = "20240205")
+    implementation(group = "org.json", name = "json", version = "20240303")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.5.1")
     //Due to bugs in the latest beta, we want to pull the latest commit from Jitpack instead of Maven.
     //implementation(group = "com.github.discord-jda", name = "JDA", version = "79b1b560b1")
@@ -44,7 +44,7 @@ dependencies {
     implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.3.3")
     implementation(group = "net.java.dev.jna", name = "jna", version = "5.14.0")
     implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.14.0")
-    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.10.0")
+    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.11.0")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-core", version = "5prealpha-SNAPSHOT")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-data", version = "5prealpha-SNAPSHOT")
     /**
