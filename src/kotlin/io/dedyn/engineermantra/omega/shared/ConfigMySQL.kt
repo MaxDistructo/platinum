@@ -282,6 +282,13 @@ object ConfigMySQL: ConfigFileInterface {
                 .executeUpdate("UPDATE leveling SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId};")
         }
     }
+    fun getCountingInfo(guildId: Long): DatabaseObject.Counting? {
+
+    }
+
+    fun setCountingInfo(countingInfo: DatabaseObject.Counting) {
+
+    }
 
 
 }

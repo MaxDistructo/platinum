@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import org.mariuszgromada.math.mxparser.License
 
 object BotMain {
     val imageProcessing: Boolean = false
@@ -21,6 +22,7 @@ object BotMain {
 
     fun run()
     {
+        License.iConfirmNonCommercialUse("acbdef")
         logger.info("Adding slash commands")
         jda.addEventListener(SlashCommandListenerAdapter())
         jda.addEventListener(LoggerListenerAdapter())

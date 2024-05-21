@@ -27,4 +27,5 @@ object DatabaseObject {
         val levelingPoints
                 get() = voicePoints + textPoints
     }
+    data class Counting(val countingId: Int, val serverId: Long, val channelId: Long, var topCount: Long, var currentCount: Long, var mostRecent: Long)
 }
