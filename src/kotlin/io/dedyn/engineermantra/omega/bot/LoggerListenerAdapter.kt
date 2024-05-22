@@ -32,7 +32,9 @@ class LoggerListenerAdapter : ListenerAdapter() {
         if (messageCache.get(event.message) != null && event.guild.idLong == 967140876298092634L) {
             val loggingChannelID: Long = 967156927731748914L
             val loggingChannel: MessageChannel = BotMain.jda.getGuildChannelById(loggingChannelID) as MessageChannel
-            loggingChannel.sendMessageEmbeds(messageEditedEmbed(event)).queue()
+            if(!event.message.author.isBot) {
+                loggingChannel.sendMessageEmbeds(messageEditedEmbed(event)).queue()
+            }
         }
         messageCache.add(event.message)
     }
