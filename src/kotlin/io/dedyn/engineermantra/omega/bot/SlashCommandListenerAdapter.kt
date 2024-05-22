@@ -64,9 +64,12 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             //"purge" -> thePurge(event)
             "top" -> levelTop(event)
             "migrate_user" -> migrateUser(event);
+            "setup_counting" -> setupCounting(event)
             else -> println("Command not found")
         }
     }
+
+
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         when(event.focusedOption.name)
@@ -801,6 +804,21 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         destLevel.voicePoints = srcLevel.voicePoints
         ConfigMySQL.updateLevelingPoints(destLevel)
         event.reply("Done").queue()
+    }
+
+    private fun setupCounting(event: SlashCommandInteractionEvent) {
+        if(!event.isFromGuild){
+            return
+        }
+        val channel = event.getOption("channel")!!.asChannel
+        if(channel.type != ChannelType.TEXT){
+            event.reply("Unable to setup counting in that channel as it is not a text channel!")
+        }
+        val startCount = event.getOption("startnum")?.asLong ?: 0
+        val countingInfo = DatabaseObject.Counting(0, event.guild!!.idLong, channel.idLong, 0, startCount, 0L)
+        ConfigMySQL.setCountingInfo(countingInfo)
+        event.reply("Done!")
+        channel.asTextChannel().sendMessageEmbeds(DiscordUtils.simpleTitledEmbed(event.member!!, "Counting", "${event.member!!.asMention} has started counting at ${countingInfo.currentCount}. Next number is: ${countingInfo.currentCount + 1}", event.guild!!))
     }
 }
 

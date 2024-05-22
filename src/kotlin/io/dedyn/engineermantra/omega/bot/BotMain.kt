@@ -219,6 +219,15 @@ object BotMain {
                     .addOption(OptionType.INTEGER, "page", "Page number to display?")
             ).complete()
         }
+        if(!commandNames.contains("setup_counting")){
+            jda.upsertCommand(
+                Commands.slash("setup_counting", "Setup the counting detector on the specified channel")
+                    .setGuildOnly(true)
+                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR, Permission.MANAGE_CHANNEL))
+                    .addOption(OptionType.CHANNEL, "channel","The channel to setup counting for", true)
+                    .addOption(OptionType.INTEGER, "startnum", "The value to start counting at")
+            ).complete()
+        }
         jda.getGuildById(967140876298092634)!!.upsertCommand(
             Commands.slash("agree", "Agree to the terms and conditions in this channel")
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
