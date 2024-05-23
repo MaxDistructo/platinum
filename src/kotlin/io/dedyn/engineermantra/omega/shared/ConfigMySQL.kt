@@ -282,6 +282,40 @@ object ConfigMySQL: ConfigFileInterface {
                 .executeUpdate("UPDATE leveling SET voicePoints=${obj.voicePoints} WHERE levelingId=${obj.levelingId};")
         }
     }
+    fun getCountingInfo(guildId: Long): DatabaseObject.Counting? {
+        if(assertIsConnected()){
+            val query = connection.createStatement()
+                .executeQuery("SELECT * FROM counting WHERE guildId=$guildId;")
+            if (!query.next()) {
+                return null
+            }
+            return DatabaseObject.Counting(
+                query.getInt("countingId"),
+                guildId,
+                query.getLong("channelId"),
+                query.getLong("topCount"),
+                query.getLong("currentCount"),
+                query.getLong("mostRecent")
+            )
+        }
+        return null
+    }
+
+    fun setCountingInfo(countingInfo: DatabaseObject.Counting) {
+        if (assertIsConnected()) {
+            if (getCountingInfo(countingInfo.serverId) == null) {
+                connection.createStatement()
+                    .executeUpdate("INSERT INTO counting (guildId, channelId, topCount, currentCount, mostRecent) VALUES (${countingInfo.serverId}, ${countingInfo.channelId}, ${countingInfo.topCount}, ${countingInfo.currentCount}, ${countingInfo.mostRecent});")
+                return
+            }
+            connection.createStatement()
+                .executeUpdate("UPDATE counting SET topCount=${countingInfo.topCount} WHERE countingId=${countingInfo.countingId};")
+            connection.createStatement()
+                .executeUpdate("UPDATE counting SET currentCount=${countingInfo.currentCount} WHERE countingId=${countingInfo.countingId};")
+            connection.createStatement()
+                .executeUpdate("UPDATE counting SET mostRecent=${countingInfo.mostRecent} WHERE countingId=${countingInfo.countingId};")
+        }
+    }
 
 
 }

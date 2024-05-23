@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import org.mariuszgromada.math.mxparser.License
 
 object BotMain {
     val imageProcessing: Boolean = false
@@ -21,6 +22,7 @@ object BotMain {
 
     fun run()
     {
+        License.iConfirmNonCommercialUse("acbdef")
         logger.info("Adding slash commands")
         jda.addEventListener(SlashCommandListenerAdapter())
         jda.addEventListener(LoggerListenerAdapter())
@@ -215,6 +217,15 @@ object BotMain {
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                     .addOption(OptionType.INTEGER, "page", "Page number to display?")
+            ).complete()
+        }
+        if(!commandNames.contains("setup_counting")){
+            jda.upsertCommand(
+                Commands.slash("setup_counting", "Setup the counting detector on the specified channel")
+                    .setGuildOnly(true)
+                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR, Permission.MANAGE_CHANNEL))
+                    .addOption(OptionType.CHANNEL, "channel","The channel to setup counting for", true)
+                    .addOption(OptionType.INTEGER, "startnum", "The value to start counting at")
             ).complete()
         }
         jda.getGuildById(967140876298092634)!!.upsertCommand(

@@ -47,6 +47,7 @@ dependencies {
     implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.11.0")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-core", version = "5prealpha-SNAPSHOT")
     implementation(group = "edu.cmu.sphinx", name = "sphinx4-data", version = "5prealpha-SNAPSHOT")
+    implementation("org.mariuszgromada.math:MathParser.org-mXparser:6.0.0")
     /**
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-mustache")
