@@ -28,6 +28,7 @@ object BotMain {
         jda.addEventListener(LoggerListenerAdapter())
         jda.addEventListener(SCListenerAdapter())
         jda.addEventListener(LevelingListenerAdapter())
+        jda.addEventListener(CountingListenerAdapter())
         //Parse the known commands that we have and register any new ones but not do the old
         val commandNames = mutableListOf<String>()
         val commands = jda.retrieveCommands().complete()

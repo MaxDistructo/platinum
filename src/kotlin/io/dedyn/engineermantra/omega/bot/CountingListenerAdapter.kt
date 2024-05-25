@@ -33,7 +33,7 @@ class CountingListenerAdapter: ListenerAdapter() {
         if(digit == countingInfo.currentCount) return
         if ((countingInfo.mostRecent == event.message.author.idLong && digit == (countingInfo.currentCount + 1)) || digit != (countingInfo.currentCount + 1)){
             //BAD. NO 2x in a row from same person or count + 1
-            event.message.addReaction(Emoji.fromUnicode("U+0058")).queue()
+            event.message.addReaction(Emoji.fromUnicode("U+2620")).queue()
             countingInfo.mostRecent = 0
             countingInfo.currentCount = 0
             ConfigMySQL.setCountingInfo(countingInfo)

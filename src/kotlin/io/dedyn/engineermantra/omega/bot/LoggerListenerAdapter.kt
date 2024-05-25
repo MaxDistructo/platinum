@@ -19,15 +19,20 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
 import net.dv8tion.jda.api.events.guild.override.PermissionOverrideCreateEvent
 import net.dv8tion.jda.api.events.guild.override.PermissionOverrideDeleteEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import java.time.Instant
+import java.time.OffsetDateTime
 import java.util.*
 
 class LoggerListenerAdapter : ListenerAdapter() {
     val ioScope = Main.BotScope()
+
+    val voiceChannelMembers: MutableMap<Long, MutableList<Long>> = mutableMapOf();
+
     override fun onMessageUpdate(event: MessageUpdateEvent) {
         if (messageCache.get(event.message) != null && event.guild.idLong == 967140876298092634L) {
             val loggingChannelID: Long = 967156927731748914L
@@ -229,6 +234,44 @@ class LoggerListenerAdapter : ListenerAdapter() {
                     ).queue()
                 }
             }
+        }
+    }
+
+    /**
+     * Detect when a user joins or leaves a VC so that we can give points on leave yet not allow AFKing for points.
+     */
+    override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
+        if(event.guild.idLong != 967140876298092634)
+        {
+            return;
+        }
+        val loggingChannelID: Long = (ConfigFileJson.serverGet(event.guild.id, "logging_channel") ?: "967156927731748914").toLong()
+        val loggingChannel: MessageChannel = BotMain.jda.getGuildChannelById(loggingChannelID) as MessageChannel
+        //User Disconnected
+        if(event.channelJoined == null && event.channelLeft != null)
+        {
+            println("Checking auditlog")
+            //If the member that left most recently was kicked (we ask audit log if this is the case)
+            for (auditLogEntry in event.guild.retrieveAuditLogs()
+                .type(ActionType.MEMBER_VOICE_KICK)
+                .limit(1)
+                .complete()) {
+                println("Found log entry. Time: ${OffsetDateTime.now().toEpochSecond()} Time of most recent kick: ${auditLogEntry.timeCreated.toEpochSecond()}")
+                //Add tolerance in case we respond slowly
+                if( OffsetDateTime.now().toEpochSecond() - auditLogEntry.timeCreated.toEpochSecond() < 240 ){
+                    //Find the kicked member as the audit log doesn't know who was kicked
+                    for(member in voiceChannelMembers[event.channelLeft?.idLong]!!){
+                        if(!(event.channelLeft!!.members.contains(event.guild.getMemberById(member)))){
+                            //Send Message
+                            loggingChannel.sendMessageEmbeds(DiscordUtils.simpleEmbed(event.member, "Kicked ${event.guild.getMemberById(member)!!.asMention} from ${event.channelLeft!!.asMention}", event.guild)).queue()
+                        }
+                    }
+                }
+            }
+        }
+        //User Joined
+        else {
+            voiceChannelMembers[event.channelJoined?.idLong]?.add(event.member.idLong)
         }
     }
 
