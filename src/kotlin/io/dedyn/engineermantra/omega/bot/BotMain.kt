@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import org.mariuszgromada.math.mxparser.License
 
 object BotMain {
@@ -45,28 +46,22 @@ object BotMain {
                 "vote" -> {
                     jda.deleteCommandById(command.id).queue();
                 }
+                "ping" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
+                "echo" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
+                "give_role" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
+                "editstrike" -> {
+                    jda.deleteCommandById(command.id).queue();
+                }
                 else -> {
                     commandNames.add(command.name)
                 }
             }
-        }
-        if(!commandNames.contains("ping")) {
-            jda.upsertCommand("ping", "Ping the bot").complete()
-        }
-        if(!commandNames.contains("echo")) {
-            jda.upsertCommand(
-                Commands.slash("echo", "Repeats what you said")
-                    .addOption(OptionType.STRING, "message", "the message to say", true, false)
-            ).complete()
-        }
-        if(!commandNames.contains("give_role")) {
-            jda.upsertCommand(
-                Commands.slash("give_role", "Gives a role to a user")
-                    .setGuildOnly(true)
-                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
-                    .addOption(OptionType.ROLE, "role", "The role to give", true, false)
-                    .addOption(OptionType.USER, "user", "The user to give a role to", true, false)
-            ).complete()
         }
         if(!commandNames.contains("give_all_role")) {
             jda.upsertCommand(
@@ -112,25 +107,33 @@ object BotMain {
         if(!commandNames.contains("strike")) {
             jda.upsertCommand(
                 Commands.slash("strike", "Issue a strike for a user")
-                    .setGuildOnly(true)
+                    .addSubcommands(
+                        SubcommandData("issue", "Issue a strike")
+                            .addOption(OptionType.STRING, "strike_type", "The type of strike to issue", true, true)
+                            .addOption(OptionType.USER, "user", "The user to issue a strike against", true, false)
+                            .addOption(OptionType.STRING, "reason", "A reason for the strike being issued", false, false)
+                            .addOption(
+                                OptionType.INTEGER,
+                                "points",
+                                "The amount of points to assign this strike. 1-4",
+                                false,
+                                false
+                            )
+                            .addOption(
+                                OptionType.BOOLEAN,
+                                "send_dm",
+                                "Send a DM for this strike? (Default: true)",
+                                false,
+                                false
+                            ),
+                        SubcommandData("edit", "Edit a previously issued strike")
+                            .addOption(OptionType.INTEGER, "strikeid", "The ID number of the strike to modify", true, false)
+                            .addOption(OptionType.STRING, "reason", "The reason for this strike", false, false)
+                            .addOption(OptionType.INTEGER, "points", "Edit the number of points this strike counts for.")
+                    )
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_EVENTS))
-                    .addOption(OptionType.STRING, "strike_type", "The type of strike to issue", true, true)
-                    .addOption(OptionType.USER, "user", "The user to issue a strike against", true, false)
-                    .addOption(OptionType.STRING, "reason", "A reason for the strike being issued", false, false)
-                    .addOption(
-                        OptionType.INTEGER,
-                        "points",
-                        "The amount of points to assign this strike. 1-4",
-                        false,
-                        false
-                    )
-                    .addOption(
-                        OptionType.BOOLEAN,
-                        "send_dm",
-                        "Send a DM for this strike? (Default: true)",
-                        false,
-                        false
-                    )
+                    .setGuildOnly(true)
+
             ).complete()
         }
         if(!commandNames.contains("strikes")) {
@@ -148,21 +151,39 @@ object BotMain {
                     )
             ).complete()
         }
-        if(!commandNames.contains("editstrike")) {
-            jda.upsertCommand(
-                Commands.slash("editstrike", "Update a previously issued strike")
-                    .setGuildOnly(true)
-                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
-                    .addOption(OptionType.INTEGER, "strikeid", "The ID number of the strike to modify", true, false)
-                    .addOption(OptionType.STRING, "reason", "The reason for this strike", false, false)
-                    .addOption(OptionType.INTEGER, "points", "Edit the number of points this strike counts for.")
-            ).complete()
-        }
         if(!commandNames.contains("audit")) {
             jda.upsertCommand(
                 Commands.slash("audit", "Audit everything that the bot manages. (Booster perks, etc)")
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
+            ).complete()
+        }
+        if(!commandNames.contains("report")){
+            jda.upsertCommand(
+                Commands.slash("report", "Report an issue with the application")
+                    .addSubcommands(
+                        SubcommandData("add", "Report a new issue")
+                            .addOption(
+                                OptionType.STRING,
+                                "message",
+                                "Please describe your issue with the application or the TOS violation you believe has occurred.",
+                                true,
+                                false
+                            )
+                            .addOption(
+                                OptionType.STRING,
+                                "action",
+                                "What action would you like to have taken?",
+                                false,
+                                false
+                            )
+                            .addOption(
+                                OptionType.BOOLEAN,
+                                "reply",
+                                "Can ${jda.retrieveApplicationInfo().complete().owner.name} contact you in relation to this issue?"
+                            )
+                    )
+
             ).complete()
         }
         /**

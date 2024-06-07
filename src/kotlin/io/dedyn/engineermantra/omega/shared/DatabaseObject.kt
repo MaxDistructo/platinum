@@ -28,4 +28,6 @@ object DatabaseObject {
                 get() = voicePoints + textPoints
     }
     data class Counting(val countingId: Int, val serverId: Long, val channelId: Long, var topCount: Long, var currentCount: Long, var mostRecent: Long)
+
+    data class AltAccountRecord(val recordId: Int, val primaryAccount: Long, var altAccounts: MutableList<String>)
 }
