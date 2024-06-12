@@ -65,7 +65,8 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "top" -> levelTop(event)
             "migrate_user" -> migrateUser(event);
             "setup_counting" -> setupCounting(event)
-            else -> println("Command not found")
+            "report" -> fileReport(event)
+            else -> println("Command not found ${event.name}")
         }
     }
 
@@ -819,6 +820,11 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         ConfigMySQL.setCountingInfo(countingInfo)
         event.reply("Done!")
         channel.asTextChannel().sendMessageEmbeds(DiscordUtils.simpleTitledEmbed(event.member!!, "Counting", "${event.member!!.asMention} has started counting at ${countingInfo.currentCount}. Next number is: ${countingInfo.currentCount + 1}", event.guild!!))
+    }
+    private fun fileReport(event: SlashCommandInteractionEvent){
+        event.reply("Your report has been filed").queue();
+        val botOwner = event.jda.retrieveApplicationInfo().complete().owner
+        botOwner.openPrivateChannel().complete().sendMessage("New Report: \n User: ${event.user.name} \n Report: ${event.getOption("message")!!.asString} \n Action Requested: ${event.getOption("action")?.asString ?: "No action requested"} \n Do they wish to be contacted?: ${event.getOption("reply")?.asBoolean ?: "No"} ").queue()
     }
 }
 

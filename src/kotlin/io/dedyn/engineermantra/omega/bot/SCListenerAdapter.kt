@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.sourceforge.tess4j.Tesseract
@@ -242,6 +243,20 @@ class SCListenerAdapter : ListenerAdapter() {
         if(event.guild.idLong == 967140876298092634L)
         {
             addRolesInServer(event.member.idLong, 1165357291629989979L, event.roles)
+        }
+    }
+
+    override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
+        println("Reaction added to: ${event.messageIdLong}")
+        if(event.messageIdLong == 1250224928859357305L){
+            val channel = event.guild.getGuildChannelById(1087346724474998796)
+            channel!!.permissionContainer.upsertPermissionOverride(event.member!!)
+                .setAllowed(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue()
+        }
+        else if(event.messageIdLong == 1250226375286194266L){
+            val channel = event.guild.getGuildChannelById(1241883049713598484)
+            channel!!.permissionContainer.upsertPermissionOverride(event.member!!)
+                .setAllowed(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue()
         }
     }
 

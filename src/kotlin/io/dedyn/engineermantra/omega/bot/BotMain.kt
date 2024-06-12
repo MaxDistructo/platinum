@@ -174,13 +174,15 @@ object BotMain {
                                 OptionType.STRING,
                                 "action",
                                 "What action would you like to have taken?",
-                                false,
+                                true,
                                 false
                             )
                             .addOption(
                                 OptionType.BOOLEAN,
                                 "reply",
-                                "Can ${jda.retrieveApplicationInfo().complete().owner.name} contact you in relation to this issue?"
+                                "Can ${jda.retrieveApplicationInfo().complete().owner.name} contact you in relation to this issue?",
+                                true,
+                                false
                             )
                     )
 
