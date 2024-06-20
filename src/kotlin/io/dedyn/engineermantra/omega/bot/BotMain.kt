@@ -252,11 +252,14 @@ object BotMain {
                     .addOption(OptionType.INTEGER, "startnum", "The value to start counting at")
             ).complete()
         }
-        jda.getGuildById(967140876298092634)!!.upsertCommand(
-            Commands.slash("agree", "Agree to the terms and conditions in this channel")
-                .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                .setGuildOnly(true)
-        ).complete()
+        if(!commandNames.contains("registeralt")){
+            jda.upsertCommand(
+                Commands.slash("registeralt", "Register your alt with the bot. This may be required depending on server rules.")
+                    .setGuildOnly(true)
+                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+                    .addOption(OptionType.MENTIONABLE, "user", "The user to add as an alt account of you", true)
+            ).complete()
+        }
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("sync", "Sync roles from Salem Central")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)

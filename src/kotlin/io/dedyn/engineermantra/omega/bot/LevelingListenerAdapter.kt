@@ -23,6 +23,10 @@ class LevelingListenerAdapter: ListenerAdapter() {
 	    {
 		    println("Member is null. (THIS SHOULD NEVER HAPPEN)");
 	    }
+        //Ignore mudae-bot channel
+        if(event.channel.idLong == 1241883049713598484L){
+            return
+        }
 	    if(textUserList.containsKey(event.member!!.idLong))
         {
             val currentTime = System.currentTimeMillis()

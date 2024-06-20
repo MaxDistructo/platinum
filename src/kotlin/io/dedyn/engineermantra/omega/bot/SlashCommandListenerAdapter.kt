@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
@@ -66,6 +67,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "migrate_user" -> migrateUser(event);
             "setup_counting" -> setupCounting(event)
             "report" -> fileReport(event)
+            "registeralt" -> registerAlt(event)
             else -> println("Command not found ${event.name}")
         }
     }
@@ -825,6 +827,30 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         event.reply("Your report has been filed").queue();
         val botOwner = event.jda.retrieveApplicationInfo().complete().owner
         botOwner.openPrivateChannel().complete().sendMessage("New Report: \n User: ${event.user.name} \n Report: ${event.getOption("message")!!.asString} \n Action Requested: ${event.getOption("action")?.asString ?: "No action requested"} \n Do they wish to be contacted?: ${event.getOption("reply")?.asBoolean ?: "No"} ").queue()
+    }
+    private val ALT_CAP = 1;
+    private fun registerAlt(event: SlashCommandInteractionEvent){
+        //required parameter
+        val altAccount = event.getOption("user")!!.asMember
+        //First, try to get the list of alts for the user.
+        val altList = ConfigMySQL.getAlts(event.user.idLong)
+        if(altList.count() >= ALT_CAP){
+            val loggingChannelID: Long = (ConfigFileJson.serverGet(event.guild!!.id, "logging_channel") ?: "967156927731748914").toLong()
+            val loggingChannel: MessageChannel = BotMain.jda.getGuildChannelById(loggingChannelID) as MessageChannel
+            loggingChannel.sendMessage("${event.member!!.asMention} has attempted to register more than the allowed alt number. New Alt: ${altAccount!!.asMention}").queue()
+        }
+        else{
+            ConfigMySQL.addAlt(event.user.idLong, altAccount!!.idLong)
+        }
+        event.reply("Your alt account has been registered").queue()
+        for(role in event.member!!.roles){
+            if(role.name == "User" || role.name == "Trusted User"){
+                event.guild!!.addRoleToMember(altAccount, role).queue();
+            }
+        }
+        //Add the Alt role to the account as well
+        val altRole = event.guild!!.getRolesByName("Registered Alt", false)[0]
+        event.guild!!.addRoleToMember(altAccount, altRole).queue();
     }
 }
 

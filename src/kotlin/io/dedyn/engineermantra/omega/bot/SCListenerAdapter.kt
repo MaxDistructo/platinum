@@ -2,6 +2,7 @@ package io.dedyn.engineermantra.omega.bot
 
 import io.dedyn.engineermantra.omega.bot.DiscordUtils.addRolesInServer
 import io.dedyn.engineermantra.omega.bot.DiscordUtils.removeRolesInServer
+import io.dedyn.engineermantra.omega.shared.ConfigFileJson
 import io.dedyn.engineermantra.omega.shared.ConfigMySQL
 import io.dedyn.engineermantra.omega.shared.MessageLevel
 import io.dedyn.engineermantra.omega.shared.Timer
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.guild.GuildBanEvent
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
@@ -209,6 +211,11 @@ class SCListenerAdapter : ListenerAdapter() {
                     }
                 }
             }
+            if (event.message.channel.idLong == 1241883049713598484L && event.message.mentions.members.any()){
+                val loggingChannelID: Long = (ConfigFileJson.serverGet(event.guild!!.id, "logging_channel") ?: "967156927731748914").toLong()
+                val loggingChannel: MessageChannel = BotMain.jda.getGuildChannelById(loggingChannelID) as MessageChannel
+                loggingChannel.sendMessage("Mudae Log\n${event.message.contentRaw}")
+            }
         }
     }
 
@@ -247,7 +254,7 @@ class SCListenerAdapter : ListenerAdapter() {
     }
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
-        println("Reaction added to: ${event.messageIdLong}")
+        //println("Reaction added to: ${event.messageIdLong}")
         if(event.messageIdLong == 1250224928859357305L){
             val channel = event.guild.getGuildChannelById(1087346724474998796)
             channel!!.permissionContainer.upsertPermissionOverride(event.member!!)

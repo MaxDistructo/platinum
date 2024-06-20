@@ -106,6 +106,14 @@ object ConfigMySQL: ConfigFileInterface {
                     "textPoints INT" +
                     ");"
         )
+        //Link Table
+        connection.createStatement().execute(
+            "CREATE TABLE altAccounts(" +
+                "altAccountsId INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT," +
+                "userId BIGINT," +
+                "altId BIGINT" +
+            ");"
+        )
     }
 
     fun addStrike(strike: DatabaseObject.Strike): Int {
@@ -314,6 +322,32 @@ object ConfigMySQL: ConfigFileInterface {
                 .executeUpdate("UPDATE counting SET currentCount=${countingInfo.currentCount} WHERE countingId=${countingInfo.countingId};")
             connection.createStatement()
                 .executeUpdate("UPDATE counting SET mostRecent=${countingInfo.mostRecent} WHERE countingId=${countingInfo.countingId};")
+        }
+    }
+
+    fun addAlt(userId: Long, altId: Long){
+        if(assertIsConnected()){
+            connection.createStatement().executeUpdate("INSERT INTO altlist (userId, altId) VALUES (${userId}, ${altId});")
+            connection.createStatement().executeUpdate("INSERT INTO altlist (userId, altId) VALUES (${altId}, ${userId});")
+        }
+    }
+    fun getAlts(userId: Long): List<DatabaseObject.AltEntry>{
+        val result = connection.createStatement().executeQuery("SELECT * FROM altlist WHERE userId=${userId};")
+        val retval = mutableListOf<DatabaseObject.AltEntry>();
+        while(result.next()){
+            retval.add(
+                DatabaseObject.AltEntry(
+                    result.getLong("userId"),
+                    result.getLong("altId")
+                )
+            )
+        }
+        return retval
+    }
+    fun deleteAlt(altId: Long){
+        if(assertIsConnected()){
+            connection.createStatement().executeUpdate("DELETE FROM altlist WHERE userId=${altId}")
+            connection.createStatement().executeUpdate("DELETE FROM altlist WHERE altId=${altId}")
         }
     }
 
