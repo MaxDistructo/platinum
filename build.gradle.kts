@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25")
     }
 }
 plugins {
@@ -33,7 +33,7 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "1.9.24")
+    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "1.9.25")
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.8.1")
     implementation(group = "org.json", name = "json", version = "20240303")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.5.6")
