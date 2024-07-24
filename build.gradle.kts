@@ -10,7 +10,7 @@ buildscript {
     }
 }
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "1.9.25"
     //id("com.github.johnrengelman.shadow") version "7.1.2"
     //id "com.github.ben-manes.versions" version "0.20.0"
     //id 'com.sedmelluq.jdaction' version '1.0.2'
