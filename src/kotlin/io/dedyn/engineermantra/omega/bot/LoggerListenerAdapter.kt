@@ -34,7 +34,7 @@ class LoggerListenerAdapter : ListenerAdapter() {
     val voiceChannelMembers: MutableMap<Long, MutableList<Long>> = mutableMapOf();
 
     override fun onMessageUpdate(event: MessageUpdateEvent) {
-        if (messageCache.get(event.message) != null && event.guild.idLong == 967140876298092634L) {
+        if (messageCache.get(event.message) != null && event.guild.idLong == 967140876298092634L && event.channel.idLong != 983863329363755048L) {
             val loggingChannelID: Long = 967156927731748914L
             val loggingChannel: MessageChannel = BotMain.jda.getGuildChannelById(loggingChannelID) as MessageChannel
             if(!event.message.author.isBot) {
