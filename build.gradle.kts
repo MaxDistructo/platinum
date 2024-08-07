@@ -10,7 +10,7 @@ buildscript {
     }
 }
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "1.9.25"
     //id("com.github.johnrengelman.shadow") version "7.1.2"
     //id "com.github.ben-manes.versions" version "0.20.0"
     //id 'com.sedmelluq.jdaction' version '1.0.2'
@@ -72,9 +72,15 @@ sourceSets["main"].withConvention(conventionType = org.jetbrains.kotlin.gradle.p
 }
 */
 
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
-    kotlinOptions.freeCompilerArgs += "-Xjsr305=strict"
+    kotlinOptions {
+        jvmTarget = "21"
+    }
 }
 
 tasks {
@@ -85,15 +91,6 @@ tasks {
         dependsOn(fatJar)
     }
 }
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_17.toString()
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_17.toString()
-}
-
 val fatJar = task("fatJar", type = Jar::class) {
     duplicatesStrategy = DuplicatesStrategy.WARN
     manifest {
