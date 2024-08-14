@@ -93,19 +93,12 @@ object Auditing {
         val botcGuild = BotMain.jda.getGuildById(1165357291629989979L)
         if(guild.idLong == 967140876298092634L) {
             for (member in guild.members) {
-                if (!member.roles.contains(guild.getRoleById(1078829209616666705)) && !ConfigMySQL.checkHasRoleBan(member.idLong, 1078829209616666705))
-                {
+                if (!member.roles.contains(guild.getRoleById(1078829209616666705)) && !ConfigMySQL.checkHasRoleBan(
+                        member.idLong,
+                        1078829209616666705
+                    )
+                ) {
                     guild.addRoleToMember(member, guild.getRoleById(1078829209616666705)!!).queue()
-                }
-            }
-            for (role in botcGuild!!.roles) {
-                //Audit cleanup of old roles that need to be deleted. Hopefully can remove this later.
-                if(guild.getRolesByName(role.name, false).isEmpty())
-                {
-                    //Fix an audit crash related to us trying to delete a bot role that is in BOTC but not SC
-                    if(!role.isManaged) {
-                        role.delete().queue()
-                    }
                 }
             }
         }
