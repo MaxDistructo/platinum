@@ -34,7 +34,7 @@ dependencies {
     //implementation(group = "com.github.discord-jda", name = "JDA", version = "79b1b560b1")
     implementation(group = "net.dv8tion", name = "JDA", version = "5.2.1")
     implementation(group = "club.minnced", name = "discord-webhooks", version = "0.8.4")
-    implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.5.1")
+    implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.5.2")
     implementation(group = "net.java.dev.jna", name = "jna", version = "5.15.0")
     implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.15.0")
     implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.13.0")
