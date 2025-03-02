@@ -79,6 +79,9 @@ tasks.withType<KotlinCompile> {
 tasks {
     jar {
         manifest.attributes["Main-Class"] = "io.dedyn.engineermantra.omega.Main"
+        exclude("META-INF/*.SF")
+        exclude("META-INF/*.DSA")
+        exclude("META-INF/*.RSA")
     }
     "build" {
         dependsOn(fatJar)
@@ -91,6 +94,8 @@ val fatJar = task("fatJar", type = Jar::class) {
         attributes["Implementation-Version"] = "1.0"
         attributes["Main-Class"] = "io.dedyn.engineermantra.omega.Main"
     }
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    }
     with(tasks.jar.get() as CopySpec)
 }
