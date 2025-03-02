@@ -223,7 +223,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
     fun setColor(event: SlashCommandInteractionEvent)
     {
         //This is locked to ONLY server boosters/staff with manage role permissions
-        if(event.member!!.isBoosting || event.member!!.hasPermission(Permission.MANAGE_ROLES)) {
+        if(event.member!!.isBoosting || event.member!!.hasPermission(Permission.MANAGE_ROLES) || event.guild?.idLong == 1165357291629989979L) {
             val user: User = event.getOption("user", event.user, OptionMapping::getAsUser)
             var color = event.getOption("color")!!.asString
             //Fix a common user issue with them not putting the # at the start of the color code
