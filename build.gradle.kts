@@ -70,11 +70,6 @@ kotlin {
         (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "21"
-    }
-}
 
 tasks {
     jar {
