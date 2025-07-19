@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Logger
 import io.dedyn.engineermantra.omega.shared.TimerThread
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.interactions.InteractionContextType
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -66,7 +67,7 @@ object BotMain {
         if(!commandNames.contains("give_all_role")) {
             jda.upsertCommand(
                 Commands.slash("give_all_role", "Give all members a role")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                     .addOption(OptionType.ROLE, "role", "The role to give", true, false)
                     .addOption(OptionType.ROLE, "role2", "1st restriction", false, false)
@@ -85,7 +86,7 @@ object BotMain {
         if(!commandNames.contains("role")) {
             jda.upsertCommand(
                 Commands.slash("role", "Set or create your booster role. If you're not a booster, this will not work.")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     //If you can manage roles, you can just create this manually anyways.
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                     .addOption(
@@ -132,14 +133,14 @@ object BotMain {
                             .addOption(OptionType.INTEGER, "points", "Edit the number of points this strike counts for.")
                     )
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_EVENTS))
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
 
             ).complete()
         }
         if(!commandNames.contains("strikes")) {
             jda.upsertCommand(
                 Commands.slash("strikes", "Check the strikes against yourself or someone else")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                     .addOption(OptionType.USER, "user", "The person to check strikes for", false, false)
                     .addOption(
@@ -154,7 +155,7 @@ object BotMain {
         if(!commandNames.contains("audit")) {
             jda.upsertCommand(
                 Commands.slash("audit", "Audit everything that the bot manages. (Booster perks, etc)")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
             ).complete()
         }
@@ -193,7 +194,7 @@ object BotMain {
             jda.upsertCommand(
                 Commands.slash("poll", "Create a poll")
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOption(OptionType.STRING, "prompt", "What do you want to ask about?", true, false)
                     .addOption(OptionType.STRING, "option1", "Option 1", true, false)
                     .addOption(OptionType.STRING, "option2", "Option 2", true, false)
@@ -211,7 +212,7 @@ object BotMain {
             jda.upsertCommand(
                 Commands.slash("vote", "A poll with a yes/no option only")
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOption(OptionType.STRING, "prompt", "What do you want to ask about?", true, false)
             ).complete()
         }
@@ -220,7 +221,7 @@ object BotMain {
             jda.upsertCommand(
                 Commands.slash("level", "View your level")
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOption(OptionType.USER, "user", "The user to get the level for. Defaults to yourself.", false, false)
             ).complete()
         }
@@ -229,7 +230,7 @@ object BotMain {
             jda.upsertCommand(
                 Commands.slash("migrate_user", "Migrate user")
                     .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOption(OptionType.USER, "src_user", "The user to get the roles and stats from", true, false)
                     .addOption(OptionType.USER, "dest_user", "The user to give the roles and stats to", true, false)
             ).complete()
@@ -238,58 +239,42 @@ object BotMain {
         {
             jda.upsertCommand(
                 Commands.slash("top", "Display the top 10 people by level in the server")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
                     .addOption(OptionType.INTEGER, "page", "Page number to display?")
             ).complete()
         }
-        if(!commandNames.contains("setup_counting")){
-            jda.upsertCommand(
-                Commands.slash("setup_counting", "Setup the counting detector on the specified channel")
-                    .setGuildOnly(true)
-                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR, Permission.MANAGE_CHANNEL))
-                    .addOption(OptionType.CHANNEL, "channel","The channel to setup counting for", true)
-                    .addOption(OptionType.INTEGER, "startnum", "The value to start counting at")
-            ).complete()
-        }
-        if(!commandNames.contains("registeralt")){
-            jda.upsertCommand(
-                Commands.slash("registeralt", "Register your alt with the bot. This may be required depending on server rules.")
-                    .setGuildOnly(true)
-                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-                    .addOption(OptionType.MENTIONABLE, "user", "The user to add as an alt account of you", true)
-            ).complete()
-        }
+
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("sync", "Sync roles from Salem Central")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("goodnight", "Sends members to SLEEP")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("goodmorning", "Wakes everyone up")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("summon", "Summon all VC members")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("goto", "Goto Person in VC")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
                 .addOption(OptionType.USER, "user", "The user to go to")
         ).complete()
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("promote", "Promote a user to Storyteller")
                 .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
                 .addOption(OptionType.USER, "user", "The user to go to", false)
                 .addOption(OptionType.BOOLEAN, "force", "Force yourself to become primary", false)
         ).complete()
