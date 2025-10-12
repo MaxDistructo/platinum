@@ -1,7 +1,5 @@
 package io.dedyn.engineermantra.omega.bot.voice
 
-import edu.cmu.sphinx.api.Configuration
-import edu.cmu.sphinx.api.StreamSpeechRecognizer
 import net.dv8tion.jda.api.audio.AudioReceiveHandler
 import net.dv8tion.jda.api.audio.UserAudio
 import java.nio.ByteBuffer
