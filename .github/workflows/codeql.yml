@@ -48,7 +48,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     # We target Java 17 so run the setup Java action to bump our version to 17
     - uses: actions/setup-java@v1
