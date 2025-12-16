@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
-import net.dv8tion.jda.api.interactions.components.buttons.Button
+//import net.dv8tion.jda.api.interactions.components.buttons.Button
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -52,7 +52,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "audit" -> runAuditing(event)
             //"poll" -> createPoll(event)
             //"vote" -> createPoll(event)
-            "agree" -> ruleAgreement(event)
+//            "agree" -> ruleAgreement(event)
             "level" -> checkLevel(event)
             "level2" -> checkLevel(event)
             "record" -> recordChannel(event)
@@ -465,13 +465,13 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         Auditing.runAuditing(event.jda)
     }
 
-    fun ruleAgreement(event: SlashCommandInteractionEvent)
-    {
-        //Command is dumb and lets the individual server listeners handle the button's action
-        event.reply("Do you agree to the rules specified?")
-            .addActionRow(Button.primary("agree", "Agree"), Button.danger("disagree", "Disagree"))
-            .queue()
-    }
+//    fun ruleAgreement(event: SlashCommandInteractionEvent)
+//    {
+//        //Command is dumb and lets the individual server listeners handle the button's action
+//        event.reply("Do you agree to the rules specified?")
+//            .addActionRow(Button.primary("agree", "Agree"), Button.danger("disagree", "Disagree"))
+//            .queue()
+//    }
     fun checkLevel(event: SlashCommandInteractionEvent)
     {
         val userOption = event.getOption("user")
@@ -530,9 +530,9 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
                 role.delete().queue()
             }
             //This is not null here, the above enforces it. Some reason this doesn't agree
-            else if(role.color != scRole!!.color)
+            else if(role.colors.primary != scRole!!.colors.primary)
             {
-                role.manager.setColor(scRole!!.color).queue()
+                role.manager.setColor(scRole.colors.primary).queue()
             }
         }
     }

@@ -100,19 +100,19 @@ class SCListenerAdapter : ListenerAdapter() {
      * Button logic for SC's Sensitive Topics entry channel
      */
 
-    override fun onButtonInteraction(event: ButtonInteractionEvent) {
-        if (event.isFromGuild && event.guildChannel.idLong == 1121230172155302019 && event.button.id == "agree") {
-            val channel = event.guild!!.getGuildChannelById(1087346724474998796)
-            channel!!.permissionContainer.upsertPermissionOverride(event.member!!)
-                .setAllowed(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue()
-            val ruleAgreement = event.guild!!.getGuildChannelById(1121230172155302019)
-            ruleAgreement!!.permissionContainer.upsertPermissionOverride(event.member!!)
-                .setDenied(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue()
-        }
-        val message = event.reply("").setEphemeral(true).complete()
-        event.message.delete().queue()
-        message.deleteOriginal().queue()
-    }
+//    override fun onButtonInteraction(event: ButtonInteractionEvent) {
+//        if (event.isFromGuild && event.guildChannel.idLong == 1121230172155302019 && event.button.id == "agree") {
+//            val channel = event.guild!!.getGuildChannelById(1087346724474998796)
+//            channel!!.permissionContainer.upsertPermissionOverride(event.member!!)
+//                .setAllowed(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue()
+//            val ruleAgreement = event.guild!!.getGuildChannelById(1121230172155302019)
+//            ruleAgreement!!.permissionContainer.upsertPermissionOverride(event.member!!)
+//                .setDenied(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue()
+//        }
+//        val message = event.reply("").setEphemeral(true).complete()
+//        event.message.delete().queue()
+//        message.deleteOriginal().queue()
+//    }
 
     /**
      * SC Specific message logic

@@ -53,7 +53,7 @@ object DiscordUtils {
     fun simpleTitledEmbed(user: Member, title: String, description: String, guild: Guild): MessageEmbed {
         val builder = EmbedBuilder()
         val authorAvatar = user.user.avatarUrl
-        val color = user.color
+        val color = user.colors.primary
         val guildImage = guild.iconUrl
         val guildName = guild.name
         builder.setAuthor(user.effectiveName, authorAvatar, authorAvatar)
@@ -107,7 +107,7 @@ object DiscordUtils {
     fun simpleEmbed(user: Member, description: String, guild: Guild): MessageEmbed {
         val builder = EmbedBuilder()
         val authorAvatar = user.user.avatarUrl
-        val color = user.color
+        val color = user.colors.primary
         val guildImage = guild.iconUrl
         val guildName = guild.name
         builder.setAuthor(user.effectiveName, authorAvatar, authorAvatar)
@@ -184,7 +184,7 @@ object DiscordUtils {
         else{
             val roleAction = guild.createRole()
             roleAction.setName(role.name)
-            roleAction.setColor(role.color)
+            roleAction.setColor(role.colors.primary)
             roleAction.setPermissions(role.permissions)
             roleAction.setHoisted(role.isHoisted)
             roleAction.setMentionable(role.isMentionable)

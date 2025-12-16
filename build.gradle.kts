@@ -1,56 +1,35 @@
+// kotlin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JavaToolchainSpec
+import org.gradle.api.tasks.bundling.Jar
 
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0")
-    }
-}
 plugins {
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm") version "2.2.21"
+    id("com.github.ben-manes.versions") version "0.53.0"
+    id("org.openrewrite.rewrite") version "7.11.0"
 }
 group = "io.dedyn.engineermantra"
 
 repositories {
-    //jcenter()
     mavenCentral()
     maven("https://m2.dv8tion.net/releases")
     maven("https://jitpack.io")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
-//val compile by configurations.creating
-
-// In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "2.2.0")
-    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.2")
-    implementation(group = "org.json", name = "json", version = "20250517")
-    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.5.18")
-    //Due to bugs in the latest beta, we want to pull the latest commit from Jitpack instead of Maven.
-    //implementation(group = "com.github.discord-jda", name = "JDA", version = "79b1b560b1")
-    implementation(group = "net.dv8tion", name = "JDA", version = "5.6.1")
-    implementation(group = "club.minnced", name = "discord-webhooks", version = "0.8.4")
-    implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.5.4")
-    implementation(group = "net.java.dev.jna", name = "jna", version = "5.17.0")
-    implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.17.0")
-    implementation(group = "net.sourceforge.tess4j", name = "tess4j", version = "5.16.0")
-    //implementation(group = "edu.cmu.sphinx", name = "sphinx4-core", version = "5prealpha-SNAPSHOT")
-    //implementation(group = "edu.cmu.sphinx", name = "sphinx4-data", version = "5prealpha-SNAPSHOT")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.json:json:20250517")
+    implementation("ch.qos.logback:logback-classic:1.5.22")
+    implementation("net.dv8tion:JDA:6.2.0")
+    implementation("club.minnced:discord-webhooks:0.8.4")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
+    implementation("net.java.dev.jna:jna:5.18.1")
+    implementation("net.java.dev.jna:jna-platform:5.18.1")
+    implementation("net.sourceforge.tess4j:tess4j:5.17.0")
     implementation("org.mariuszgromada.math:MathParser.org-mXparser:6.1.0")
-    /**
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-mustache")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.springframework.boot:spring-boot-devtools")
-    */
-//implementation(kotlin("stdlib-jdk8"))
 }
 
 sourceSets {
@@ -59,38 +38,44 @@ sourceSets {
     }
 }
 
-/*
-sourceSets["main"].withConvention(conventionType = org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class){
-    kotlin.srcDir("$projectDir/src/kotlin")
-}
-*/
-
 kotlin {
     jvmToolchain {
         (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
-tasks {
-    jar {
-        manifest.attributes["Main-Class"] = "io.dedyn.engineermantra.omega.Main"
-        exclude("META-INF/*.SF")
-        exclude("META-INF/*.DSA")
-        exclude("META-INF/*.RSA")
+tasks.named<Jar>("jar") {
+    manifest {
+        attributes["Main-Class"] = "io.dedyn.engineermantra.omega.Main"
     }
-    "build" {
-        dependsOn(fatJar)
-    }
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
 }
-val fatJar = task("fatJar", type = Jar::class) {
+
+val fatJar = tasks.register<Jar>("fatJar") {
     duplicatesStrategy = DuplicatesStrategy.WARN
     manifest {
         attributes["Implementation-Title"] = "Gradle Jar File Example"
         attributes["Implementation-Version"] = "1.0"
         attributes["Main-Class"] = "io.dedyn.engineermantra.omega.Main"
     }
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
-        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-    }
-    with(tasks.jar.get() as CopySpec)
+
+    // include runtime classpath (dependencies)
+    from({
+        configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }
+    })
+
+    // include project's jar contents
+    from({
+        val jarFile = tasks.named<Jar>("jar").get().archiveFile.get().asFile
+        if (jarFile.exists()) zipTree(jarFile) else emptyList<Any>()
+    })
+
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+
+    dependsOn(tasks.named("jar"))
+    archiveClassifier.set("all")
+}
+
+tasks.named("build") {
+    dependsOn(fatJar)
 }
