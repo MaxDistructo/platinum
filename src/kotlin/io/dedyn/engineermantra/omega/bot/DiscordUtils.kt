@@ -175,7 +175,7 @@ object DiscordUtils {
 
     fun getOrCreateRole(serverId: Long, role: Role): Role
     {
-        val guild = BotMain.jda.getGuildById(serverId)!!
+        val guild: Guild = BotMain.jda.getGuildById(serverId)!!
         val potentialRoles = guild.getRolesByName(role.name, false)
         if (potentialRoles.size > 0)
         {

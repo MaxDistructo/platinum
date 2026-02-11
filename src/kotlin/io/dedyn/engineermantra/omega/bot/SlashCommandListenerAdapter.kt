@@ -11,6 +11,7 @@ import io.dedyn.engineermantra.omega.shared.Utils.calculateLevel
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
@@ -26,6 +27,11 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -68,6 +74,7 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
             "setup_counting" -> setupCounting(event)
             "report" -> fileReport(event)
             "registeralt" -> registerAlt(event)
+            "dump" -> dumpServer(event)
             else -> println("Command not found ${event.name}")
         }
     }
@@ -772,6 +779,44 @@ class SlashCommandListenerAdapter: ListenerAdapter() {
         }
         str_builder.append("Page ${pageNum}/${sorted.size / 10}")
         event.replyEmbeds(DiscordUtils.simpleEmbed(event.member!!, str_builder.toString(), event.guild!!)).queue()
+    }
+
+    fun dumpServer(event: SlashCommandInteractionEvent) {
+        if(event.guild!!.idLong != 967140876298092634L)
+        {
+            return
+        }
+
+        for(channel in event.guild!!.channels){
+            println("Channel: ${channel.name} (${channel.id}) Type: ${channel.type}")
+            val outputFile = File("${Utils.getRunningDir()}/${event.guild!!.id}/${channel.name}_${channel.id}.txt")
+            outputFile.createNewFile()
+            val writer = outputFile.writer()
+            if(channel.type == ChannelType.TEXT){
+                for(message in (channel as TextChannel).history.retrievePast(100).complete()) {
+                    writer.write("${message.author.name}: ${message.contentDisplay}\n")
+                    if(message.embeds.isNotEmpty()) {
+                        for (embed in message.embeds){
+                            if(embed.type == EmbedType.IMAGE){
+                                val client = HttpClient.newHttpClient()
+                                val request = HttpRequest.newBuilder()
+                                    .uri(URI.create(embed.image!!.url))
+                                    .build()
+                                try {
+                                    val response = client.send(request, HttpResponse.BodyHandlers.ofByteArray())
+                                    Files.write(Paths.get("${Utils.getRunningDir()}/${event.guild!!.id}/${channel.name}_${channel.id}_${message.id}.png"), response.body())
+                                }
+                                catch (ex: Exception){
+                                    println("Error downloading image")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            writer.flush()
+            writer.close()
+        }
     }
 
     private fun recordChannel(event: SlashCommandInteractionEvent) {

@@ -23,7 +23,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.json:json:20250517")
     implementation("ch.qos.logback:logback-classic:1.5.22")
-    implementation("net.dv8tion:JDA:6.2.0")
+    implementation("net.dv8tion:JDA:6.3.0")
     implementation("club.minnced:discord-webhooks:0.8.4")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
     implementation("net.java.dev.jna:jna:5.18.1")

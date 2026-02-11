@@ -244,6 +244,13 @@ object BotMain {
                     .addOption(OptionType.INTEGER, "page", "Page number to display?")
             ).complete()
         }
+        if(!commandNames.contains("dump")){
+            jda.upsertCommand(
+                Commands.slash("dump", "Dump the server and images to a JSON file per message. Also download images to the images folder.")
+                    .setContexts(InteractionContextType.GUILD)
+                    .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+            ).complete()
+        }
 
         jda.getGuildById(1165357291629989979)!!.upsertCommand(
             Commands.slash("sync", "Sync roles from Salem Central")
