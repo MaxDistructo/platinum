@@ -5,7 +5,7 @@ import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.api.tasks.bundling.Jar
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.21"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("org.openrewrite.rewrite") version "7.11.0"
 }
@@ -19,11 +19,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.json:json:20250517")
-    implementation("ch.qos.logback:logback-classic:1.5.22")
-    implementation("net.dv8tion:JDA:6.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    implementation("org.json:json:20260522")
+    implementation("ch.qos.logback:logback-classic:1.5.34")
+    implementation("net.dv8tion:JDA:6.4.2")
     implementation("club.minnced:discord-webhooks:0.8.4")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
     implementation("net.java.dev.jna:jna:5.18.1")
