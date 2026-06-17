@@ -24,7 +24,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.34")
     implementation("net.dv8tion:JDA:6.4.2")
     implementation("club.minnced:discord-webhooks:0.8.4")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.9")
     implementation("net.java.dev.jna:jna:5.18.1")
     implementation("net.java.dev.jna:jna-platform:5.18.1")
     implementation("net.sourceforge.tess4j:tess4j:5.17.0")
