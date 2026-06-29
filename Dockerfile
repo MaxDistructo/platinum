@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM gradle:8.14.3-jdk21-alpine as builder
+FROM --platform=$BUILDPLATFORM gradle:9.6.1-jdk21-alpine as builder
 COPY . /platinum
 WORKDIR /platinum
 RUN gradle build
