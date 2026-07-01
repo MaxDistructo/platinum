@@ -7,7 +7,7 @@ import org.gradle.api.tasks.bundling.Jar
 plugins {
     kotlin("jvm") version "2.3.21"
     id("com.github.ben-manes.versions") version "0.53.0"
-    id("org.openrewrite.rewrite") version "7.11.0"
+    id("org.openrewrite.rewrite") version "7.36.0"
 }
 group = "io.dedyn.engineermantra"
 
