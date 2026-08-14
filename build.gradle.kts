@@ -21,7 +21,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
     implementation("org.json:json:20260522")
-    implementation("ch.qos.logback:logback-classic:1.5.34")
+    implementation("ch.qos.logback:logback-classic:1.6.3")
     implementation("net.dv8tion:JDA:6.4.2")
     implementation("club.minnced:discord-webhooks:0.8.4")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
